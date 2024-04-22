@@ -55,6 +55,12 @@ build CMakeFiles/Elemental_SQL_Implementation.dir/main.cpp.obj: CXX_COMPILER__El
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
 
+build CMakeFiles/Elemental_SQL_Implementation.dir/menu/Menu.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/menu/Menu.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
+  DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\menu\Menu.cpp.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
+  OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\menu
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Elemental_SQL_Implementation
@@ -63,7 +69,7 @@ build CMakeFiles/Elemental_SQL_Implementation.dir/main.cpp.obj: CXX_COMPILER__El
 #############################################
 # Link the executable Elemental_SQL_Implementation.exe
 
-build Elemental_SQL_Implementation.exe: CXX_EXECUTABLE_LINKER__Elemental_SQL_Implementation_Debug CMakeFiles/Elemental_SQL_Implementation.dir/main.cpp.obj
+build Elemental_SQL_Implementation.exe: CXX_EXECUTABLE_LINKER__Elemental_SQL_Implementation_Debug CMakeFiles/Elemental_SQL_Implementation.dir/main.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/menu/Menu.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir

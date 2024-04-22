@@ -4,4 +4,7 @@ project(Elemental_SQL_Implementation)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(Elemental_SQL_Implementation main.cpp
-        Colors.h)
+        Colors.h
+        menu/Menu.cpp
+        menu/Menu.h
+)
