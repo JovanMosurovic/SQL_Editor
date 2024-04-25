@@ -2,8 +2,7 @@
 #ifndef ELEMENTAL_SQL_IMPLEMENTATION_TABLE_H
 #define ELEMENTAL_SQL_IMPLEMENTATION_TABLE_H
 
-#include <string>
-#include <vector>
+#include <iostream>
 #include "Column.h"
 #include "Row.h"
 
@@ -23,6 +22,21 @@ public:
     void removeRow(size_t rowIndex);;
 
     void updateRow(size_t rowIndex, const vector<string>& newData);
+
+    void printTable() {
+        for (const auto &column : columns) {
+            cout << column.getName() << " ";
+        }
+        putchar('\n');
+        for (const auto &row : rows) {
+            for (const auto &cell : row.getData()) {
+                cout << cell << " ";
+            }
+            putchar('\n');
+        }
+    };
+
+
 
     //<editor-fold desc="Getters">
 
