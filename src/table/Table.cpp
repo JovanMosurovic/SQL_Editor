@@ -6,7 +6,7 @@
 Table::Table(string name, const vector<Column> &columns) : name(std::move(name)), columns(columns) {}
 
 void Table::addRow(const vector<string> &rowData) {
-    rows.emplace_back(rowData);
+    rows.emplace_back(rowData); // proveri ovo
 }
 
 void Table::removeRow(size_t rowIndex) {
@@ -26,6 +26,19 @@ void Table::updateRow(size_t rowIndex, const vector<string> &newData) {
     rows[rowIndex].setData(newData);
 }
 
+void Table::printTable() {
+    for (const auto &column : columns) {
+        cout << column.getName() << " ";
+    }
+    putchar('\n');
+    for (const auto &row : rows) {
+        for (const auto &cell : row.getData()) {
+            cout << cell << " ";
+        }
+        putchar('\n');
+    }
+}
+
 //<editor-fold desc="Getters">
 
 const vector<Column> &Table::getColumns() const {
@@ -39,4 +52,5 @@ const string &Table::getName() const {
 const vector<Row> &Table::getRows() const {
     return rows;
 }
+
 //</editor-fold>
