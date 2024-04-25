@@ -1,12 +1,13 @@
 # ninja log v5
-3	396	7355200649903214	CMakeFiles/Elemental_SQL_Implementation.dir/main.cpp.obj	4089cb5e46e22988
-321	397	7355204566557361	Elemental_SQL_Implementation.exe	878effd71b6edc88
-1	194	7355211821511408	build.ninja	19d89b1bd683de15
-3	321	7355204565822346	CMakeFiles/Elemental_SQL_Implementation.dir/menu/Menu.cpp.obj	7742cee59ba97c1a
-4	331	7355211854999569	CMakeFiles/Elemental_SQL_Implementation.dir/menu/Menu.cpp.obj	7742cee59ba97c1a
-331	405	7355211855713270	Elemental_SQL_Implementation.exe	878effd71b6edc88
 4	365	7355213267758559	CMakeFiles/Elemental_SQL_Implementation.dir/main.cpp.obj	4089cb5e46e22988
-9	384	7355213267950751	CMakeFiles/Elemental_SQL_Implementation.dir/menu/Menu.cpp.obj	7742cee59ba97c1a
-384	460	7355213268678773	Elemental_SQL_Implementation.exe	878effd71b6edc88
-4	325	7355213616197442	CMakeFiles/Elemental_SQL_Implementation.dir/menu/Menu.cpp.obj	7742cee59ba97c1a
 325	398	7355213616900812	Elemental_SQL_Implementation.exe	878effd71b6edc88
+1	194	7357406804650240	build.ninja	19d89b1bd683de15
+4	325	7355213616197442	CMakeFiles/Elemental_SQL_Implementation.dir/menu/Menu.cpp.obj	7742cee59ba97c1a
+12	140	7357407094988246	CMakeFiles/Elemental_SQL_Implementation.dir/table/Row.cpp.obj	9d0d754ebdfc2501
+16	142	7357407095008237	CMakeFiles/Elemental_SQL_Implementation.dir/table/Column.cpp.obj	799e981bc93052db
+10	312	7357407096708262	CMakeFiles/Elemental_SQL_Implementation.dir/table/Table.cpp.obj	94691caf4f46e5d2
+4	442	7357407098016325	CMakeFiles/Elemental_SQL_Implementation.dir/main.cpp.obj	4089cb5e46e22988
+7	443	7357407098026333	CMakeFiles/Elemental_SQL_Implementation.dir/menu/Menu.cpp.obj	7742cee59ba97c1a
+443	665	7357407100218785	Elemental_SQL_Implementation.exe	5b1f518290861025
+3	318	7357408190695801	CMakeFiles/Elemental_SQL_Implementation.dir/menu/Menu.cpp.obj	7742cee59ba97c1a
+318	390	7357408191505815	Elemental_SQL_Implementation.exe	5b1f518290861025

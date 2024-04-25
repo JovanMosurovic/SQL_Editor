@@ -1,6 +1,5 @@
 #include <iostream>
-#include <cstdlib>
-#include "../Colors.h"
+#include "Colors.h"
 #include "Menu.h"
 
 using namespace std;
@@ -25,12 +24,14 @@ void Menu::importDatabaseMenu() {
             case 1: {
                 cout << "You have selected the option \"CREATE DATABASE\"" << endl;
                 getchar();
+                getchar();
                 //todo
                 break;
             }
 
             case 2: {
                 cout << "You have selected the option \"IMPORT DATABASE FROM FILE\"" << endl;
+                getchar();
                 getchar();
                 //todo
                 break;
