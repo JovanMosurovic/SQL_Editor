@@ -11,8 +11,8 @@ int main() {
 
     Table table("Table1", {Column("Column1"), Column("Column2")});
 
-    table.addRow({"1", "2"});
-    table.addRow({"3", "4"});
+    table.addRow({"jovaj", "jovanjovan"});
+    table.addRow({"35", "45"});
 
     table.printTable();
 
@@ -21,6 +21,8 @@ int main() {
     table.printTable();
 
     table.removeRow(1);
+
+    table.removeRow(3);
 
     table.printTable();
 

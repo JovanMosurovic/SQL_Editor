@@ -2,6 +2,8 @@
 #include "Table.h"
 
 #include <utility>
+#include <iomanip>
+#include <sstream>
 
 Table::Table(string name, const vector<Column> &columns) : name(std::move(name)), columns(columns) {}
 
@@ -27,13 +29,28 @@ void Table::updateRow(size_t rowIndex, const vector<string> &newData) {
 }
 
 void Table::printTable() {
-    for (const auto &column : columns) {
-        cout << column.getName() << " ";
+
+    vector<int> columnWidths;
+    for (const auto& column : columns) {
+        int maxWidth = column.getName().length();
+        for (const auto& row : rows) {
+            std::stringstream ss;
+            ss << row.getData()[&column - &columns[0]];
+            int cellWidth = ss.str().length();
+            maxWidth = max(maxWidth, cellWidth);
+        }
+        columnWidths.push_back(maxWidth);
+    }
+
+    for (int i = 0; i < columns.size(); i++) {
+        cout << setw(columnWidths[i]) << columns[i].getName() << " ";
     }
     putchar('\n');
     for (const auto &row : rows) {
-        for (const auto &cell : row.getData()) {
-            cout << cell << " ";
+        for (int i = 0; i < columns.size(); i++) {
+            std::stringstream ss;
+            ss << row.getData()[i];
+            cout << setw(columnWidths[i]) << ss.str() << " ";
         }
         putchar('\n');
     }
