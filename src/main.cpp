@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "menu/Menu.h"
-#include "table/Table.h"
+#include "Database.h"
 
 using namespace std;
 
@@ -10,21 +10,25 @@ int main() {
  //   Menu::importDatabaseMenu();
 
     Table table("Table1", {Column("Column1"), Column("Column2")});
+    table.addRow({"1", "2"});
+    table.addRow({"3", "4"});
+    table.addRow({"5", "6"});
+    Table table2("Table2", {Column("Column1"), Column("Column2")});
+    table2.addRow({"aa", "bb"});
+    table2.addRow({"cc", "dd"});
+    table2.addRow({"ee", "ff"});
 
-    table.addRow({"jovaj", "jovanjovan"});
-    table.addRow({"35", "45"});
+    Database database("Database1");
+    database.addTable(table);
+    database.addTable(table2);
 
-    table.printTable();
+    database.dropTable(table2.getName());
 
-    table.updateRow(0, {"5", "6"});
+    database.printDatabase();
 
-    table.printTable();
+    database.createTable("TableC", {Column("Column1"), Column("Column2")});
 
-    table.removeRow(1);
-
-    table.removeRow(3);
-
-    table.printTable();
+    database.printDatabase();
 
     return 0;
 }

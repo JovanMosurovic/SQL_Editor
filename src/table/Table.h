@@ -23,7 +23,7 @@ public:
 
     void updateRow(size_t rowIndex, const vector<string>& newData);
 
-    void printTable();;
+    void printTable() const;
 
 
 

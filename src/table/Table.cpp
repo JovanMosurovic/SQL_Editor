@@ -28,7 +28,7 @@ void Table::updateRow(size_t rowIndex, const vector<string> &newData) {
     rows[rowIndex].setData(newData);
 }
 
-void Table::printTable() {
+void Table::printTable() const {
 
     vector<int> columnWidths;
     for (const auto& column : columns) {
