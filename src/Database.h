@@ -3,10 +3,8 @@
 #define ELEMENTAL_SQL_IMPLEMENTATION_DATABASE_H
 
 #include <unordered_map>
-#include <regex>
 #include "table/Table.h"
-#include "exceptions/TableExceptions.h"
-#include "menu/Colors.h"
+#include "exceptions/DatabaseExceptions.h"
 
 class Database {
     string name;
@@ -15,7 +13,7 @@ class Database {
 public:
     Database(string name); //bez const?
 
-    void addTable(const Table& table) { //da li treba dodati proveru u samu Table klasu za ime od velikih i malih slova
+    void addTable(const Table& table) {
         if(tables.find(table.getName()) != tables.end()) {
             throw TableAlreadyExistsException(table.getName());
         }

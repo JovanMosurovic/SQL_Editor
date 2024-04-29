@@ -2,9 +2,14 @@
 #ifndef ELEMENTAL_SQL_IMPLEMENTATION_TABLE_H
 #define ELEMENTAL_SQL_IMPLEMENTATION_TABLE_H
 
-#include <iostream>
+#include <utility>
+#include <iomanip>
+#include <sstream>
+#include <regex>
 #include "Column.h"
 #include "Row.h"
+#include "../menu/Colors.h"
+#include "../exceptions/TableExceptions.h"
 
 using namespace std;
 
@@ -15,7 +20,7 @@ class Table {
     vector<Row> rows;
 
 public:
-    Table(string name, const vector<Column> &columns);
+    Table(const string& name, const vector<Column> &columns);
 
     void addRow(const vector<string>& rowData);
 

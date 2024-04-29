@@ -1,31 +1,52 @@
 
 #include "Table.h"
 
-#include <utility>
-#include <iomanip>
-#include <sstream>
-
-Table::Table(string name, const vector<Column> &columns) : name(std::move(name)), columns(columns) {}
+Table::Table(const string& name, const vector<Column> &columns) {
+    try {
+        regex tableName_pattern("^[A-Za-z]+$");
+        if (!(regex_match(name, tableName_pattern))) {
+            throw InvalidTableNameException(name);
+        }
+        this->name = name;
+        this->columns = columns;
+    } catch(const InvalidTableNameException& e) {
+        cout << e.what() << endl;
+    } catch(const exception& e) {
+        cout << red << "Unexpected exception caught: " << e.what() << resetColor << endl;
+    }
+}
 
 void Table::addRow(const vector<string> &rowData) {
-    rows.emplace_back(rowData); // proveri ovo
+    rows.emplace_back(rowData);
 }
 
 void Table::removeRow(size_t rowIndex) {
-    if(rowIndex >= rows.size()) {
-        //todo throw "Row index out of range"
+    try {
+        if (rowIndex >= rows.size()) {
+            throw RowOutOfBoundsException(rowIndex, rows.size());
+        }
+        rows.erase(rows.begin() + rowIndex);
+    } catch (const RowOutOfBoundsException &e) {
+        cout << e.what() << endl;
+    } catch (const exception &e) {
+        cout << red << "Unexpected exception caught: " << e.what() << resetColor << endl;
     }
-    rows.erase(rows.begin() + rowIndex);
 }
 
 void Table::updateRow(size_t rowIndex, const vector<string> &newData) {
-    if(rowIndex >= rows.size()) {
-        //todo throw "Row index out of range"
+    try {
+        if (rowIndex >= rows.size()) {
+            throw RowOutOfBoundsException(rowIndex, rows.size());
+        }
+        if (newData.size() != columns.size()) {
+            //todo throw "Invalid number of columns in new data"
+        }
+        rows[rowIndex].setData(newData);
+    } catch (const RowOutOfBoundsException &e) { //todo dodaj ovde exception za invalid number of columns
+        cout << e.what() << endl;
+    } catch (const exception &e) {
+        cout << red << "Unexpected exception caught: " << e.what() << resetColor << endl;
     }
-    if(newData.size() != columns.size()) {
-        //todo throw "Invalid number of columns in new data"
-    }
-    rows[rowIndex].setData(newData);
 }
 
 void Table::printTable() const {
@@ -45,15 +66,19 @@ void Table::printTable() const {
     for (int i = 0; i < columns.size(); i++) {
         cout << setw(columnWidths[i]) << columns[i].getName() << " ";
     }
+
+
+
     putchar('\n');
-    for (const auto &row : rows) {
-        for (int i = 0; i < columns.size(); i++) {
-            std::stringstream ss;
-            ss << row.getData()[i];
-            cout << setw(columnWidths[i]) << ss.str() << " ";
-        }
-        putchar('\n');
-    }
+//    for (const auto &row : rows) {
+//        cout << "Usao sam";
+//        for (int i = 0; i < columns.size(); i++) {
+//            stringstream ss;
+//            ss << row.getData()[i];
+//            cout << setw(columnWidths[i]) << ss.str() << " ";
+//        }
+//        cout << endl;
+//    }
 }
 
 //<editor-fold desc="Getters">
