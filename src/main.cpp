@@ -7,7 +7,7 @@ using namespace std;
 
 
 int main() {
- //   Menu::importDatabaseMenu();
+   // Menu::importDatabaseMenu();
 
     Table table("Table1", {Column("Column1"), Column("Column2")});
     table.addRow({"1", "2"});
@@ -24,11 +24,14 @@ int main() {
 
     database.dropTable(table2.getName());
 
-    database.printDatabase();
-
     database.createTable("TableC", {Column("Column1"), Column("Column2")});
+    database.createTable("TableC", {Column("Column2"), Column("Column4")});
 
     database.printDatabase();
+
+    database.dropTable("TableM");
+
+
 
     return 0;
 }

@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <regex>
 #include "table/Table.h"
+#include "exceptions/TableExceptions.h"
+#include "menu/Colors.h"
 
 class Database {
     string name;
@@ -15,42 +17,48 @@ public:
 
     void addTable(const Table& table) { //da li treba dodati proveru u samu Table klasu za ime od velikih i malih slova
         if(tables.find(table.getName()) != tables.end()) {
-            //todo throw "Table +tableName already exists in database"
-            cout << "Usao u if" << endl;
-            return;
+            throw TableAlreadyExistsException(table.getName());
         }
         tables.emplace(table.getName(), table);
     }
 
     void createTable(const string& tableName, const vector<Column>& columns) {
-        regex tableName_pattern("^[A-Za-z]+$");
-        if(!(regex_match(tableName, tableName_pattern))) {
-            //todo throw "Table name is not typed in corrected format.\n
-            // Format: Only English letters are allowed without spaces or special characters."
-            cout << "Usao u if" << endl;
-            return;
-        }
+        try {
+            regex tableName_pattern("^[A-Za-z]+$");
+            if (!(regex_match(tableName, tableName_pattern))) {
+                throw InvalidTableNameException(tableName);
+            }
 
-        auto it = tables.find(tableName);
-        if(it != tables.end()) {
-            //todo throw "Table +tableName already exists in database"
-            cout << "Usao u if" << endl;
-            return;
+            auto it = tables.find(tableName);
+            if (it != tables.end()) {
+                throw TableAlreadyExistsException(tableName);
+            }
+            tables.emplace(tableName, Table(tableName, columns));
+        } catch (const InvalidTableNameException& e) {
+            cout << e.what() << endl;
+        } catch (const TableAlreadyExistsException& e) {
+            cout << e.what() << endl;
+        } catch(const exception& e) {
+            cout << red << "Unexpected exception caught: " << e.what() << resetColor << endl;
         }
-        tables.emplace(tableName, Table(tableName, columns));
     }
 
     void dropTable(const string& tableName) {
-        auto it = tables.find(tableName);
-        if(it == tables.end()) {
-            //todo throw "Table +tableName does not exist in database"
-            cout << "Usao u if" << endl;
-            return;
+        try {
+            auto it = tables.find(tableName);
+            if (it == tables.end()) {
+                throw TableDoesNotExistException(tableName);
+            }
+            tables.erase(it);
+        } catch(const TableDoesNotExistException& e) {
+            cout << red << "Cannot drop the table because it does not exist or you do not have permission." << resetColor << endl;
+            cout << e.what() << endl;
+        } catch(const exception& e) {
+            cout << red << "Unexpected exception caught: " << e.what() << resetColor << endl;
         }
-        tables.erase(it);
     }
 
-    void printDatabase() {
+    void printDatabase() { // pomocna funkcija za ispis, ne treba za projekat
         cout << "Database: " << name << endl;
         cout << "Tables: " << endl;
         for(const auto& table : tables) {

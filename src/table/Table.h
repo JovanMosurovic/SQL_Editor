@@ -19,7 +19,7 @@ public:
 
     void addRow(const vector<string>& rowData);
 
-    void removeRow(size_t rowIndex);;
+    void removeRow(size_t rowIndex);
 
     void updateRow(size_t rowIndex, const vector<string>& newData);
 
