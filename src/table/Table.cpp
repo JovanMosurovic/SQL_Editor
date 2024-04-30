@@ -2,17 +2,12 @@
 #include "Table.h"
 
 Table::Table(const string& name, const vector<Column> &columns) {
-    try {
-        regex tableName_pattern("^[A-Za-z]+$");
-        if (!(regex_match(name, tableName_pattern))) {
-            throw InvalidTableNameException(name);
-        }
+    regex tableName_pattern("^[A-Za-z]+$");
+    if (regex_match(name, tableName_pattern)) {
         this->name = name;
         this->columns = columns;
-    } catch(const InvalidTableNameException& e) {
-        cout << e.what() << endl;
-    } catch(const exception& e) {
-        cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
+    } else {
+        throw InvalidTableNameException(name);
     }
 }
 
@@ -60,7 +55,7 @@ void Table::updateRow(size_t rowIndex, const vector<string> &newData) {
     }
 }
 
-void Table::printTable() const {
+void Table::printTable() const { //fixme: ne radi ispis
 
     vector<int> columnWidths;
     for (const auto& column : columns) {
@@ -83,7 +78,6 @@ void Table::printTable() const {
 
     putchar('\n');
     for (const auto &row : rows) {
-        cout << "Usao sam";
         for (int i = 0; i < columns.size(); i++) {
             stringstream ss;
             ss << row.getData()[i];
