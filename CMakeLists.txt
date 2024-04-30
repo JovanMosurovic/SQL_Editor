@@ -19,6 +19,6 @@ add_executable(Elemental_SQL_Implementation src/main.cpp
         src/exceptions/TableExceptions.h
         src/exceptions/SyntaxExceptions.h
         src/exceptions/MenuExceptions.h
-        sql/Statement.cpp
-        sql/Statement.h
+        src/sql/Statement.cpp
+        src/sql/Statement.h
 )

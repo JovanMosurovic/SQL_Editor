@@ -106,7 +106,7 @@ void Database::removeRowFromTable(const string &tableName, size_t rowIndex) {
     }
 }
 
-void Database::printDatabase() { // pomocna funkcija za ispis, ne treba za projekat
+void Database::printDatabase() { // helper function for printing the database, not needed for the project
     cout << "Database: " << name << endl;
     cout << "Tables: " << endl;
     for(const auto& table : tables) {
