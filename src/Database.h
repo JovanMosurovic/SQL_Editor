@@ -37,7 +37,7 @@ public:
         } catch (const TableAlreadyExistsException& e) {
             cout << e.what() << endl;
         } catch(const exception& e) {
-            cout << red << "Unexpected exception caught: " << e.what() << resetColor << endl;
+            cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
         }
     }
 
@@ -52,7 +52,7 @@ public:
             cout << red << "Cannot drop the table because it does not exist or you do not have permission." << resetColor << endl;
             cout << e.what() << endl;
         } catch(const exception& e) {
-            cout << red << "Unexpected exception caught: " << e.what() << resetColor << endl;
+            cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
         }
     }
 

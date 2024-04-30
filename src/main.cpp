@@ -7,11 +7,12 @@ using namespace std;
 int main() {
    // Menu::importDatabaseMenu();
 
-    Table table("Table1", {Column("Column1"), Column("Column2")});
-    table.addRow({"1", "2"});
+    Table table("TableC", {Column("Column1"), Column("Column2")});
+    table.addRow({"1", "2", "3"});
     table.addRow({"3", "4"});
     table.addRow({"5", "6"});
-    Table table2("TableTwo", {Column("Column123"), Column("Column234")});
+    table.updateRow(1, {"7", "8", "9"});
+    Table table2("TableTwo", {Column("Column1"), Column("Column2")});
     table2.addRow({"aa", "bb"});
     table2.addRow({"cc", "dd"});
     table2.addRow({"ee", "ff"});
