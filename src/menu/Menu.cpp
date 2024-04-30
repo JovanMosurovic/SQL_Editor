@@ -76,12 +76,11 @@ void Menu::mainMenu(Database &database) {
         cout << "\xC0\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xD9\n";
         cout << "\xB3" << "Enter a number to select your desired option: " << endl << "\xC4>";
         cin >> choice;
-        //   cleanConsole();
 
         switch (choice) {
             case 1: {
                 cout << "You have selected the option \"EXECUTE SQL QUERY \"" << endl;
-
+                //todo
                 break;
             }
 

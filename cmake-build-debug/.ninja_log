@@ -12,3 +12,8 @@
 5	1225	7362062499857971	CMakeFiles/Elemental_SQL_Implementation.dir/src/main.cpp.obj	866a09e8a6b85ad8
 10	2464	7361858622036773	CMakeFiles/Elemental_SQL_Implementation.dir/src/table/Table.cpp.obj	c0dc3e9f228b9d56
 13	1185	7362062499447333	CMakeFiles/Elemental_SQL_Implementation.dir/src/Database.cpp.obj	d7238d12114c809a
+14	62	7362076616089654	CMakeFiles/Elemental_SQL_Implementation.dir/sql/Statement.cpp.obj	8734cd2dafec2d40
+3	656	7362076622025795	CMakeFiles/Elemental_SQL_Implementation.dir/src/main.cpp.obj	866a09e8a6b85ad8
+7	679	7362076622255986	CMakeFiles/Elemental_SQL_Implementation.dir/src/menu/Menu.cpp.obj	dd5dc29f0924b0b9
+10	2333	7362076638689113	CMakeFiles/Elemental_SQL_Implementation.dir/src/Database.cpp.obj	d7238d12114c809a
+2333	4619	7362076661603241	Elemental_SQL_Implementation.exe	18e36d115b4719c7
