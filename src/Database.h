@@ -32,8 +32,6 @@ public:
                 throw TableAlreadyExistsException(tableName);
             }
             tables.emplace(tableName, Table(tableName, columns));
-        } catch (const InvalidTableNameException& e) {
-            cout << e.what() << endl;
         } catch (const TableAlreadyExistsException& e) {
             cout << e.what() << endl;
         } catch(const exception& e) {
@@ -51,6 +49,69 @@ public:
         } catch(const TableDoesNotExistException& e) {
             cout << e.what() << endl;
         } catch(const exception& e) {
+            cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
+        }
+    }
+
+    void addRowToTable(const string& tableName, const vector<string>& rowData) {
+        try {
+            auto it = tables.find(tableName);
+            if (it == tables.end()) {
+                throw TableDoesNotExistException(tableName);
+            }
+            if (rowData.size() != it->second.getColumns().size()) {
+                throw InvalidDataForAddRowException(rowData.size(), it->second.getColumns().size());
+            }
+            it->second.addRow(rowData);
+        } catch (const TableDoesNotExistException& e) {
+            cout << e.what() << endl;
+        } catch (const InvalidDataForAddRowException& e) {
+            cout << e.what() << endl;
+        } catch (const exception& e) {
+            cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
+        }
+    }
+
+    void updateRowInTable(const string& tableName, const size_t rowIndex, const vector<string>& rowData) {
+        try {
+            auto it = tables.find(tableName);
+            if(it == tables.end()) {
+                throw TableDoesNotExistException(tableName);
+            }
+            if(rowIndex >= it->second.getRows().size()) {
+                throw RowOutOfBoundsException(rowIndex, it->second.getRows().size());
+            }
+            if(rowData.size() > it->second.getRows().size()) {
+                throw InvalidDataForUpdateException(rowData.size(), it->second.getRows().size());
+            }
+
+            it->second.updateRow(rowIndex, rowData);
+        } catch (const TableDoesNotExistException& e) {
+            cout << e.what() << endl;
+        } catch (const RowOutOfBoundsException& e) {
+            cout << e.what() << endl;
+        } catch (const InvalidDataForUpdateException& e) {
+            cout << e.what() << endl;
+        } catch (const exception& e) {
+            cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
+        }
+    }
+
+    void removeRowFromTable(const string& tableName, size_t rowIndex) {
+        try {
+            auto it = tables.find(tableName);
+            if (it == tables.end()) {
+                throw TableDoesNotExistException(tableName);
+            }
+            if (rowIndex > it->second.getRows().size()) {
+                throw RowOutOfBoundsException(rowIndex, it->second.getRows().size());
+            }
+            it->second.removeRow(rowIndex);
+        } catch (const TableDoesNotExistException& e) {
+            cout << e.what() << endl;
+        } catch (const RowOutOfBoundsException& e) {
+            cout << e.what() << endl;
+        } catch (const exception& e) {
             cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
         }
     }
