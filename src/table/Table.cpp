@@ -55,7 +55,7 @@ void Table::updateRow(size_t rowIndex, const vector<string> &newData) {
     }
 }
 
-void Table::printTable() const { //fixme: ne radi ispis
+void Table::printTable() const {
 
     vector<int> columnWidths;
     for (const auto& column : columns) {
