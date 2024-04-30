@@ -85,6 +85,12 @@ build CMakeFiles/Elemental_SQL_Implementation.dir/src/Database.cpp.obj: CXX_COMP
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src
 
+build CMakeFiles/Elemental_SQL_Implementation.dir/sql/Statement.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/sql/Statement.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
+  DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\sql\Statement.cpp.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
+  OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\sql
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Elemental_SQL_Implementation
@@ -93,7 +99,7 @@ build CMakeFiles/Elemental_SQL_Implementation.dir/src/Database.cpp.obj: CXX_COMP
 #############################################
 # Link the executable Elemental_SQL_Implementation.exe
 
-build Elemental_SQL_Implementation.exe: CXX_EXECUTABLE_LINKER__Elemental_SQL_Implementation_Debug CMakeFiles/Elemental_SQL_Implementation.dir/src/main.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/menu/Menu.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/table/Table.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/table/Row.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/table/Column.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/Database.cpp.obj
+build Elemental_SQL_Implementation.exe: CXX_EXECUTABLE_LINKER__Elemental_SQL_Implementation_Debug CMakeFiles/Elemental_SQL_Implementation.dir/src/main.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/menu/Menu.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/table/Table.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/table/Row.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/table/Column.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/Database.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/sql/Statement.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir

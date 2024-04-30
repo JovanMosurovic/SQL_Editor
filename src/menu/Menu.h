@@ -11,7 +11,6 @@ public:
     static void mainMenu(Database& database);
 
 private:
-    static unordered_map<string, Database> databases; // dal treba static
     static void cleanConsole();
     static void finishProgram();
 

@@ -22,17 +22,23 @@ void Menu::importDatabaseMenu() {
 
         switch (choice) {
             case 1: {
-                cout << "You have selected the option \"CREATE DATABASE\"" << endl;
-                string databaseName;
-                cout << "Enter the name of the database you want to create: " << endl << "\xC4>";
-                cin >> databaseName;
-                if(databaseName.empty()) {
-                    cout << red <<  "Database name cannot be empty!" << resetColor << endl;
-                    //todo exception
-                    break;
+                try {
+                    cout << "You have selected the option \"CREATE DATABASE\"" << endl;
+                    string databaseName;
+                    cout << "Enter the name of the database you want to create: " << endl << "\xC4>";
+                    cin >> databaseName;
+                    if (databaseName.empty()) {
+                        throw DatabaseNameException(databaseName);
+                    }
+                    auto *database = new Database(databaseName);
+                    cout << "Database \"" << databaseName << "\" has been " << green << "successfully" << resetColor << " created!" << endl;
+                    mainMenu(*database);
+                } catch (const DatabaseNameException& e) {
+                    cout << e.what() << endl;
+                } catch (const exception& e) {
+                    cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
                 }
-                Database database(databaseName);
-                cout << "Database \"" << databaseName << "\" has been " << green <<  "successfully" << resetColor <<  " created!" << endl;
+
                 break;
             }
 
