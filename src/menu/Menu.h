@@ -2,7 +2,7 @@
 #ifndef ELEMENTAL_SQL_IMPLEMENTATION_MENU_H
 #define ELEMENTAL_SQL_IMPLEMENTATION_MENU_H
 
-#include "../Database.h"
+#include "../database/Database.h"
 
 class Menu {
 

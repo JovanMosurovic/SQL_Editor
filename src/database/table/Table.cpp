@@ -24,7 +24,7 @@ void Table::addRow(const vector<string> &rowData) {
     }
 }
 
-void Table::removeRow(size_t rowIndex) {
+void Table::removeRow(const long long rowIndex) {
     try {
         if (rowIndex >= rows.size()) {
             throw RowOutOfBoundsException(rowIndex, rows.size());
@@ -37,7 +37,7 @@ void Table::removeRow(size_t rowIndex) {
     }
 }
 
-void Table::updateRow(size_t rowIndex, const vector<string> &newData) {
+void Table::updateRow(const long long rowIndex, const vector<string> &newData) {
     try {
         if (rowIndex >= rows.size()) {
             throw RowOutOfBoundsException(rowIndex, rows.size());
@@ -75,8 +75,8 @@ void Table::printTable() const {
     for (int i = 0; i < columns.size(); i++) {
         cout << setw(columnWidths[i]) << columns[i].getName() << " ";
     }
+    cout << endl;
 
-    putchar('\n');
     for (const auto &row : rows) {
         for (int i = 0; i < columns.size(); i++) {
             stringstream ss;

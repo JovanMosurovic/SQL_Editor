@@ -8,8 +8,8 @@
 #include <regex>
 #include "Column.h"
 #include "Row.h"
-#include "../menu/Colors.h"
-#include "../exceptions/TableExceptions.h"
+#include "../../menu/Colors.h"
+#include "../../exceptions/TableExceptions.h"
 
 using namespace std;
 
@@ -24,9 +24,9 @@ public:
 
     void addRow(const vector<string>& rowData);
 
-    void removeRow(size_t rowIndex);
+    void removeRow(long long rowIndex);
 
-    void updateRow(size_t rowIndex, const vector<string>& newData);
+    void updateRow(long long rowIndex, const vector<string>& newData);
 
     void printTable() const;
 

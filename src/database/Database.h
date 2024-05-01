@@ -4,7 +4,7 @@
 
 #include <unordered_map>
 #include "table/Table.h"
-#include "exceptions/DatabaseExceptions.h"
+#include "../exceptions/DatabaseExceptions.h"
 
 class Database {
     string name;
@@ -21,9 +21,9 @@ public:
 
     void addRowToTable(const string& tableName, const vector<string>& rowData);
 
-    void updateRowInTable(const string& tableName, const size_t rowIndex, const vector<string>& rowData);
+    void updateRowInTable(const string& tableName, long long rowIndex, const vector<string>& rowData);
 
-    void removeRowFromTable(const string& tableName, size_t rowIndex);
+    void removeRowFromTable(const string& tableName, long long rowIndex);
 
     void printDatabase();
 
