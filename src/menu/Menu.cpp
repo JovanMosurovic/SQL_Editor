@@ -80,7 +80,14 @@ void Menu::mainMenu(Database &database) {
         switch (choice) {
             case 1: {
                 cout << "You have selected the option \"EXECUTE SQL QUERY \"" << endl;
-                //todo
+                query = readSQLQuery();
+
+                cout << query << endl;
+
+                if (!query.empty()) {
+                    Statement* statement = parseSQLQuery(query);
+                }
+
                 break;
             }
 
@@ -102,6 +109,35 @@ void Menu::mainMenu(Database &database) {
     } while (choice != 0);
 }
 
+string Menu::readSQLQuery() {
+    string query;
+    string line;
+    bool wasPreviousLineEmpty = false;
+    bool hasTextBeenEntered = false;
+
+    while (true) {
+        getline(cin, line);
+        if (line.empty()) {
+            if (wasPreviousLineEmpty && hasTextBeenEntered) {
+                break;
+            } else {
+                wasPreviousLineEmpty = true;
+                continue;
+            }
+        } else {
+            wasPreviousLineEmpty = false;
+            hasTextBeenEntered = true;
+        }
+        query += line + "\n";
+    }
+    return query;
+}
+
+Statement *Menu::parseSQLQuery(const string &query) {
+    return nullptr;
+}
+
+
 void Menu::cleanConsole() {
     #ifdef _WIN32
             system("cls"); // For Windows
@@ -120,5 +156,4 @@ void Menu::finishProgram() {
     cout << "\xC0\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xD9\n";
     exit(0);
 }
-
 

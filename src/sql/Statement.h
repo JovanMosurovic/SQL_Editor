@@ -10,7 +10,7 @@ protected:
     string query;
 
 public:
-    explicit Statement(string query);
+    Statement(string query);
     virtual ~Statement();
 
     virtual bool parse() = 0;

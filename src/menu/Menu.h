@@ -3,6 +3,7 @@
 #define ELEMENTAL_SQL_IMPLEMENTATION_MENU_H
 
 #include "../database/Database.h"
+#include "../sql/Statement.h"
 
 class Menu {
 
@@ -13,6 +14,8 @@ public:
 private:
     static void cleanConsole();
     static void finishProgram();
+    static string readSQLQuery();
+    static Statement* parseSQLQuery(const string& query);
 
 };
 

@@ -2,8 +2,15 @@
 #ifndef ELEMENTAL_SQL_IMPLEMENTATION_SELECTSTATEMENT_H
 #define ELEMENTAL_SQL_IMPLEMENTATION_SELECTSTATEMENT_H
 
+#include <string>
+#include <vector>
+#include "Statement.h"
 
-class SelectStatement {
+using namespace std;
+
+class SelectStatement : public Statement {
+
+
 
 };
 
