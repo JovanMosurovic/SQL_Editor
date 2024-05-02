@@ -23,4 +23,18 @@ add_executable(Elemental_SQL_Implementation src/main.cpp
         src/sql/Statement.h
         src/sql/SelectStatement.cpp
         src/sql/SelectStatement.h
+        src/sql/CreateTableStatement.cpp
+        src/sql/CreateTableStatement.h
+        src/sql/DropTableStatement.cpp
+        src/sql/DropTableStatement.h
+        src/sql/InnerJoinStatement.cpp
+        src/sql/InnerJoinStatement.h
+        src/sql/InsertIntoStatement.cpp
+        src/sql/InsertIntoStatement.h
+        src/sql/UpdateStatement.cpp
+        src/sql/UpdateStatement.h
+        src/sql/DeleteFromStatement.cpp
+        src/sql/DeleteFromStatement.h
+        src/sql/ShowTablesStatement.cpp
+        src/sql/ShowTablesStatement.h
 )

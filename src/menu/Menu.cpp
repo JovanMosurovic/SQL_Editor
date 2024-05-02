@@ -1,6 +1,14 @@
 #include <iostream>
 #include "Colors.h"
 #include "Menu.h"
+#include "../sql/CreateTableStatement.h"
+#include "../sql/DropTableStatement.h"
+#include "../sql/SelectStatement.h"
+#include "../sql/InnerJoinStatement.h"
+#include "../sql/InsertIntoStatement.h"
+#include "../sql/UpdateStatement.h"
+#include "../sql/DeleteFromStatement.h"
+#include "../sql/ShowTablesStatement.h"
 
 using namespace std;
 
@@ -63,7 +71,6 @@ void Menu::importDatabaseMenu() {
 
 void Menu::mainMenu(Database &database) {
     int choice;
-    string query;
     do {
         cout << "\n\xDA\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xC4\xBF" << endl;
         cout << "\xB3                 MENU                 \xB3\n";
@@ -80,12 +87,12 @@ void Menu::mainMenu(Database &database) {
         switch (choice) {
             case 1: {
                 cout << "You have selected the option \"EXECUTE SQL QUERY \"" << endl;
-                query = readSQLQuery();
+                vector<string> queries = readSQLQuery(); // vector used in case there are multiple queries in one input
 
-                cout << query << endl;
-
-                if (!query.empty()) {
-                    Statement* statement = parseSQLQuery(query);
+                for(const auto& query : queries) {
+                    if(query.empty()) {
+                        Statement* statement = parseSQLQuery(query);
+                    }
                 }
 
                 break;
@@ -109,16 +116,18 @@ void Menu::mainMenu(Database &database) {
     } while (choice != 0);
 }
 
-string Menu::readSQLQuery() {
+vector<string> Menu::readSQLQuery() {
     string query;
     string line;
     bool wasPreviousLineEmpty = false;
     bool hasTextBeenEntered = false;
+    vector<string> queries;
 
     while (true) {
         getline(cin, line);
         if (line.empty()) {
             if (wasPreviousLineEmpty && hasTextBeenEntered) {
+                queries.push_back(query);
                 break;
             } else {
                 wasPreviousLineEmpty = true;
@@ -128,13 +137,33 @@ string Menu::readSQLQuery() {
             wasPreviousLineEmpty = false;
             hasTextBeenEntered = true;
         }
-        query += line + "\n";
+        if (line.back() == ';') {
+            query += line.substr(0, line.size() - 1);
+            queries.push_back(query);
+            query.clear();
+        } else {
+            query += line + "\n";
+        }
     }
-    return query;
+    return queries;
 }
 
 Statement *Menu::parseSQLQuery(const string &query) {
-    return nullptr;
+    std::regex create_table_regex("^CREATE TABLE ([a-zA-Z]+) \\(([^)]+)\\)$", std::regex_constants::icase);
+    regex drop_table_regex("^DROP TABLE.*", regex_constants::icase);
+    regex select_regex("^SELECT.*FROM.*", regex_constants::icase);
+    regex insert_regex("^INSERT INTO.*", regex_constants::icase);
+    regex update_regex("^UPDATE.*SET.*", regex_constants::icase);
+    regex delete_regex("^DELETE FROM.*", regex_constants::icase);
+    regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
+    regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
+
+    if (regex_match(query, create_table_regex)) {
+        return new CreateTableStatement(query);
+    } else {
+        throw invalid_argument("Invalid SQL query");
+    }
+
 }
 
 
