@@ -17,6 +17,7 @@ private:
     static void finishProgram();
     static vector<string> readSQLQuery();
     static shared_ptr<Statement> parseSQLQuery(const string& query);
+    static void highlightKeywords(string& line);
 
 };
 

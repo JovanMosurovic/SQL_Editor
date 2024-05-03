@@ -26,6 +26,7 @@ const std::string bgGreen = "\033[1;42m"; // Green background
 const std::string bgYellow = "\033[1;43m"; // Yellow background
 const std::string bgBlue = "\033[1;44m"; // Blue background
 const std::string bgMagenta = "\033[1;45m"; // Magenta background
+const std::string bgGray = "\033[1;100m"; // Gray background
 const std::string bgCyan = "\033[1;46m"; // Cyan background
 const std::string bgWhite = "\033[1;47m"; // White background
 

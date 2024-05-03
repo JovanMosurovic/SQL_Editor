@@ -5,7 +5,7 @@
 #include "Statement.h"
 
 class CreateTableStatement : public Statement {
-    string tableName;;
+    string tableName;
     vector<string> columns;
 
 public:

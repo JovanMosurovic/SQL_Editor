@@ -89,6 +89,10 @@ void Menu::mainMenu(Database &database) {
                 cout << "You have selected the option \"EXECUTE SQL QUERY \"" << endl;
                 cleanConsole();
                 vector<string> queries = readSQLQuery(); // vector used in case there are multiple queries in one input
+                //print queries
+                for(const auto& query : queries) {
+                    cout << query << endl;
+                }
 
                 for(const auto& query : queries) {
                     if(query.empty()) {
@@ -117,35 +121,48 @@ void Menu::mainMenu(Database &database) {
     } while (choice != 0);
 }
 
-vector<string> Menu::readSQLQuery() {
+vector<string> Menu::readSQLQuery() { //fixme - not working properly
     string query;
     string line;
     bool wasPreviousLineEmpty = false;
     bool hasTextBeenEntered = false;
     vector<string> queries;
+    int counter = 1;
 
+    cout << bgGray << "Enter your SQL query. Type \"EXIT\" to finish." << resetColor << endl;
     while (true) {
+        cout << bgGray << counter << ". " << resetColor;
         getline(cin, line);
+        if(line == "exit" || line == "EXIT") {
+            break;
+        }
         if (line.empty()) {
-            if (wasPreviousLineEmpty && hasTextBeenEntered) {
+            if (counter > 1 && wasPreviousLineEmpty && hasTextBeenEntered) {
                 queries.push_back(query);
                 break;
             } else {
                 wasPreviousLineEmpty = true;
+                counter++;
                 continue;
             }
         } else {
             wasPreviousLineEmpty = false;
             hasTextBeenEntered = true;
         }
-        if (line.back() == ';') {
-            query += line.substr(0, line.size() - 1);
+        string originalLine = line;
+        highlightKeywords(line);
+        cout << "\033[A\033[K";
+        cout << bgGray << counter << ". " << resetColor << line << endl;
+        if (originalLine.back() == ';') {
+            query += originalLine.substr(0, originalLine.size() - 1);
             queries.push_back(query);
             query.clear();
         } else {
-            query += line + "\n";
+            query += originalLine + "\n";
         }
+        counter++;
     }
+    cleanConsole();
     return queries;
 }
 
@@ -162,11 +179,35 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
     if (regex_match(query, create_table_regex)) {
         return make_shared<CreateTableStatement>(query);
     } else {
-        throw invalid_argument("Invalid SQL query");
+        throw invalid_argument("Invalid SQL query"); //todo
     }
 
 }
 
+void Menu::highlightKeywords(string& line) {
+    map<string, string> keywords = {
+            {"SELECT", blue},
+            {"FROM", blue},
+            {"WHERE", blue},
+            {"INNER JOIN", blue},
+            {"ON", blue},
+            {"CREATE", yellow},
+            {"TABLE", yellow},
+            {"DROP", yellow},
+            {"INSERT", yellow},
+            {"INTO", yellow},
+            {"UPDATE", yellow},
+            {"SET", yellow},
+            {"DELETE", yellow},
+            {"SHOW", yellow},
+            {"TABLES", yellow}
+    };
+
+    for (const auto& keyword : keywords) {
+        regex keywordPattern("\\b" + keyword.first + "\\b", regex_constants::icase);
+        line = regex_replace(line, keywordPattern, keyword.second + keyword.first + resetColor);
+    }
+}
 
 void Menu::cleanConsole() {
     #ifdef _WIN32
