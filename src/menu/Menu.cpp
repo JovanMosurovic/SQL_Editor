@@ -151,7 +151,7 @@ vector<string> Menu::readSQLQuery() {
             line = regex_replace(line, regex("\\s+"), " ");
 
             // Split the line into separate queries based on ';'
-            stringstream ss(line); // Use the modified line here
+            stringstream ss(line);
             string item;
             while (getline(ss, item, ';')) {
                 if (!item.empty()) {
@@ -174,7 +174,7 @@ vector<string> Menu::readSQLQuery() {
 
 
 shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
-    std::regex create_table_regex("^CREATE TABLE ([a-zA-Z]+) \\(([^)]+)\\)$", std::regex_constants::icase);
+    regex create_table_regex("^CREATE TABLE ([a-zA-Z]+) \\(([^)]+)\\)$", regex_constants::icase);
     regex drop_table_regex("^DROP TABLE.*", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
     regex insert_regex("^INSERT INTO.*", regex_constants::icase);
