@@ -5,12 +5,13 @@ using namespace std;
 int main() {
 
     try {
-//        // testiranje izuzetaka
-//        auto *table = new Table("tableA", {Column("column1"), Column("column2")});
-//        table->addRow({"data1", "data2"});
-//
-//        table->printTable();
-//
+        // testiranje izuzetaka
+        auto *table = new Table("tableA", {Column("column123"), Column("colum")});
+        table->addRow({"data1", "data2"});
+        table->addRow({"data1", "data21343124532"});
+
+        table->printTable();
+
 //        auto *database = new Database("database");
 //        database->addTable(*table);
 //
@@ -33,7 +34,7 @@ int main() {
 //
 //        database->printDatabase();
 
-        Menu::importDatabaseMenu();
+    //    Menu::importDatabaseMenu();
     } catch (const InvalidTableNameException& e) { // because of constructor of class Table
         cout << e.what() << endl;
     }

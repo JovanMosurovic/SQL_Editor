@@ -91,7 +91,7 @@ void Menu::mainMenu(Database &database) {
 
                 for(const auto& query : queries) {
                     if(query.empty()) {
-                        Statement* statement = parseSQLQuery(query);
+                        shared_ptr<Statement> statement = parseSQLQuery(query);
                     }
                 }
 
@@ -148,7 +148,7 @@ vector<string> Menu::readSQLQuery() {
     return queries;
 }
 
-Statement *Menu::parseSQLQuery(const string &query) {
+shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
     std::regex create_table_regex("^CREATE TABLE ([a-zA-Z]+) \\(([^)]+)\\)$", std::regex_constants::icase);
     regex drop_table_regex("^DROP TABLE.*", regex_constants::icase);
     regex select_regex("^SELECT.*FROM.*", regex_constants::icase);
@@ -159,7 +159,7 @@ Statement *Menu::parseSQLQuery(const string &query) {
     regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
 
     if (regex_match(query, create_table_regex)) {
-        return new CreateTableStatement(query);
+        return make_shared<CreateTableStatement>(query);
     } else {
         throw invalid_argument("Invalid SQL query");
     }

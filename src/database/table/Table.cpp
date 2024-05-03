@@ -56,35 +56,29 @@ void Table::updateRow(const long long rowIndex, const vector<string> &newData) {
 }
 
 void Table::printTable() const {
-
-    vector<int> columnWidths;
+    vector<string> columnNames;
+    columnNames.reserve(columns.size());
     for (const auto& column : columns) {
-        int maxWidth = column.getName().length();
-        int columnIndex = &column - &columns[0];
-        for (const auto& row : rows) {
-            int cellWidth = 0;
-            if (columnIndex < row.getData().size()) {
-                const string& cellValue = row.getData()[columnIndex];
-                cellWidth = cellValue.empty() ? 0 : cellValue.length();
-            }
-            maxWidth = max(maxWidth, cellWidth);
-        }
-        columnWidths.push_back(maxWidth);
+        columnNames.push_back(column.getName());
     }
 
-    for (int i = 0; i < columns.size(); i++) {
-        cout << setw(columnWidths[i]) << columns[i].getName() << " ";
+    vector<vector<string>> rowData;
+    rowData.reserve(rows.size());
+    for (const auto& row : rows) {
+        rowData.push_back(row.getData());
     }
-    cout << endl;
 
-    for (const auto &row : rows) {
-        for (int i = 0; i < columns.size(); i++) {
-            stringstream ss;
-            ss << row.getData()[i];
-            cout << setw(columnWidths[i]) << ss.str() << " ";
-        }
-        cout << endl;
+    vector<int> columnWidths = ConsoleUtils::calculateColumnWidths(columnNames, rowData);
+
+    ConsoleUtils::printLine(columnWidths, '\xDA', '\xC2', '\xBF');
+    ConsoleUtils::printRow(columnNames, columnWidths);
+
+    for (const auto & row : rows) {
+        ConsoleUtils::printLine(columnWidths, '\xC3', '\xC5', '\xB4');
+        ConsoleUtils::printRow(row.getData(), columnWidths);
     }
+
+    ConsoleUtils::printLine(columnWidths, '\xC0', '\xC1', '\xD9');
 }
 
 //<editor-fold desc="Getters">

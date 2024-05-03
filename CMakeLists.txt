@@ -37,4 +37,6 @@ add_executable(Elemental_SQL_Implementation src/main.cpp
         src/sql/DeleteFromStatement.h
         src/sql/ShowTablesStatement.cpp
         src/sql/ShowTablesStatement.h
+        src/menu/ConsoleUtils.cpp
+        src/menu/ConsoleUtils.h
 )

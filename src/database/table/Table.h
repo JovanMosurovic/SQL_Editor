@@ -9,6 +9,7 @@
 #include "Column.h"
 #include "Row.h"
 #include "../../menu/Colors.h"
+#include "../../menu/ConsoleUtils.h"
 #include "../../exceptions/TableExceptions.h"
 
 using namespace std;
@@ -29,7 +30,6 @@ public:
     void updateRow(long long rowIndex, const vector<string>& newData);
 
     void printTable() const;
-
 
 
     //<editor-fold desc="Getters">
