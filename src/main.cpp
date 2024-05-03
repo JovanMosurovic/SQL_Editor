@@ -34,7 +34,7 @@ int main() {
 //
 //        database->printDatabase();
 
-    //    Menu::importDatabaseMenu();
+        Menu::importDatabaseMenu();
     } catch (const InvalidTableNameException& e) { // because of constructor of class Table
         cout << e.what() << endl;
     }

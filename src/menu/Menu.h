@@ -4,6 +4,7 @@
 
 #include "../database/Database.h"
 #include "../sql/Statement.h"
+#include "ConsoleUtils.h"
 
 class Menu {
 
