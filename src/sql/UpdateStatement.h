@@ -6,6 +6,12 @@
 
 class UpdateStatement : public Statement {
 
+public:
+    UpdateStatement(const string &query);
+
+    bool parse() override;
+    void execute(Database &db) override;
+
 };
 
 

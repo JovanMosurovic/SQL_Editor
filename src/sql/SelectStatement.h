@@ -10,6 +10,12 @@ using namespace std;
 
 class SelectStatement : public Statement {
 
+public:
+    SelectStatement(const string &query);
+
+    bool parse() override;
+
+    void execute(Database &db) override;
 
 
 };

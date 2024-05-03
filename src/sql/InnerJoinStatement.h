@@ -6,6 +6,12 @@
 
 class InnerJoinStatement : public Statement {
 
+public:
+    InnerJoinStatement(const string &query);
+
+    bool parse() override;
+    void execute(Database &db) override;
+
 };
 
 

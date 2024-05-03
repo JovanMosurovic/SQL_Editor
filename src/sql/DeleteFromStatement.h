@@ -6,6 +6,12 @@
 
 class DeleteFromStatement : public Statement {
 
+public:
+    DeleteFromStatement(const string &query);
+
+    bool parse() override;
+    void execute(Database &db) override;
+
 };
 
 

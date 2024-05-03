@@ -121,55 +121,62 @@ void Menu::mainMenu(Database &database) {
     } while (choice != 0);
 }
 
-vector<string> Menu::readSQLQuery() { //fixme - not working properly
+vector<string> Menu::readSQLQuery() {
     string query;
     string line;
     bool wasPreviousLineEmpty = false;
     bool hasTextBeenEntered = false;
     vector<string> queries;
-    int counter = 1;
+    bool firstLine = true;
+    int counter = 0;
 
-    cout << bgGray << "Enter your SQL query. Type \"EXIT\" to finish." << resetColor << endl;
-    while (true) {
-        cout << bgGray << counter << ". " << resetColor;
+    cout << bgGray << "Enter your SQL query. Type \"EXIT\" to exit the console." << resetColor << endl;
+    do {
+        if (!firstLine) {
+            cout << bgGray << counter << "." << resetColor << " ";
+        }
         getline(cin, line);
         if(line == "exit" || line == "EXIT") {
             break;
         }
-        if (line.empty()) {
-            if (counter > 1 && wasPreviousLineEmpty && hasTextBeenEntered) {
-                queries.push_back(query);
-                break;
-            } else {
-                wasPreviousLineEmpty = true;
-                counter++;
-                continue;
-            }
-        } else {
+        if (!line.empty()) {
             wasPreviousLineEmpty = false;
             hasTextBeenEntered = true;
-        }
-        string originalLine = line;
-        highlightKeywords(line);
-        cout << "\033[A\033[K";
-        cout << bgGray << counter << ". " << resetColor << line << endl;
-        if (originalLine.back() == ';') {
-            query += originalLine.substr(0, originalLine.size() - 1);
+            string originalLine = line;
+            highlightKeywords(line);
+            cout << "\033[A\033[2K";
+            cout << bgGray << counter << "." << resetColor << " " << line << endl;
+
+            // Replace multiple spaces with a single space
+            line = regex_replace(line, regex("\\s+"), " ");
+
+            // Split the line into separate queries based on ';'
+            stringstream ss(line); // Use the modified line here
+            string item;
+            while (getline(ss, item, ';')) {
+                if (!item.empty()) {
+                    queries.push_back(item);
+                }
+            }
+        } else if (counter > 1 && wasPreviousLineEmpty && hasTextBeenEntered) {
             queries.push_back(query);
-            query.clear();
+            break;
         } else {
-            query += originalLine + "\n";
+            wasPreviousLineEmpty = true;
         }
         counter++;
-    }
+        firstLine = false;
+    } while (true);
     cleanConsole();
     return queries;
 }
 
+
+
 shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
     std::regex create_table_regex("^CREATE TABLE ([a-zA-Z]+) \\(([^)]+)\\)$", std::regex_constants::icase);
     regex drop_table_regex("^DROP TABLE.*", regex_constants::icase);
-    regex select_regex("^SELECT.*FROM.*", regex_constants::icase);
+    regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
     regex insert_regex("^INSERT INTO.*", regex_constants::icase);
     regex update_regex("^UPDATE.*SET.*", regex_constants::icase);
     regex delete_regex("^DELETE FROM.*", regex_constants::icase);
@@ -178,29 +185,46 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
 
     if (regex_match(query, create_table_regex)) {
         return make_shared<CreateTableStatement>(query);
+    } else if (regex_match(query, drop_table_regex)) {
+        return make_shared<DropTableStatement>(query);
+    } else if (regex_match(query, select_regex)) {
+        return make_shared<SelectStatement>(query);
+    } else if (regex_match(query, insert_regex)) {
+        return make_shared<InsertIntoStatement>(query);
+    } else if (regex_match(query, update_regex)) {
+        return make_shared<UpdateStatement>(query);
+    } else if (regex_match(query, delete_regex)) {
+        return make_shared<DeleteFromStatement>(query);
+    } else if (regex_match(query, show_tables_regex)) {
+        return make_shared<ShowTablesStatement>(query);
+    } else if (regex_match(query, join_regex)) {
+        return make_shared<InnerJoinStatement>(query);
     } else {
         throw invalid_argument("Invalid SQL query"); //todo
     }
-
 }
+
+
+
 
 void Menu::highlightKeywords(string& line) {
     map<string, string> keywords = {
-            {"SELECT", blue},
-            {"FROM", blue},
-            {"WHERE", blue},
-            {"INNER JOIN", blue},
-            {"ON", blue},
+            {"SELECT", red},
+            {"FROM", red},
+            {"WHERE", red},
+            {"INNER", red},
+            {"JOIN", red},
+            {"ON", red},
             {"CREATE", yellow},
             {"TABLE", yellow},
             {"DROP", yellow},
             {"INSERT", yellow},
             {"INTO", yellow},
-            {"UPDATE", yellow},
-            {"SET", yellow},
-            {"DELETE", yellow},
-            {"SHOW", yellow},
-            {"TABLES", yellow}
+            {"UPDATE", cyan},
+            {"SET", cyan},
+            {"DELETE", cyan},
+            {"SHOW", magenta},
+            {"TABLES", magenta}
     };
 
     for (const auto& keyword : keywords) {

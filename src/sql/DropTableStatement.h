@@ -6,6 +6,12 @@
 
 class DropTableStatement : public Statement {
 
+public:
+    DropTableStatement(const string &query);
+
+    bool parse() override;
+    void execute(Database &db) override;
+
 };
 
 

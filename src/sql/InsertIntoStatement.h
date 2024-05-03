@@ -6,6 +6,12 @@
 
 class InsertIntoStatement : public Statement {
 
+public:
+    InsertIntoStatement(const string &query);
+
+    bool parse() override;
+    void execute(Database &db) override;
+
 };
 
 
