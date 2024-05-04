@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 #include "Colors.h"
 #include "Menu.h"
 #include "../exceptions/SyntaxExceptions.h"
@@ -89,25 +90,33 @@ void Menu::mainMenu(Database &database) {
             case 1: {
                 cout << "You have selected the option \"EXECUTE SQL QUERY \"" << endl;
                 cleanConsole();
-                vector<string> queries = readSQLQuery();
-                for(const auto& query : queries) {
-                    if(!query.empty()) {
+                vector<pair<string, int>> queries = readSQLQuery();
+                bool hadError = false;
+                for (const auto& [query, line] : queries) {
+                    if (!query.empty()) {
                         try {
-                            shared_ptr<Statement> statement = parseSQLQuery(query);
+                            shared_ptr<Statement> statement = parseSQLQuery(query, line);
                             statement->execute(database);
                         } catch (const MissingArgumentsException& e) {
-                            cout << red << "Missing Arguments Error: " << e.what() << resetColor << endl;
+                            cout << e.what() << endl;
+                            hadError = true;
                         } catch (const InvalidArgumentsException& e) {
-                            cout << red << "Invalid Arguments Error: " << e.what() << resetColor << endl;
+                            cout << e.what() << endl;
+                            hadError = true;
                         } catch (const SyntaxException& e) {
-                            cout << red << "Syntax Error: " << e.what() << resetColor << endl;
+                            cout << e.what() << endl;
+                            hadError = true;
                         } catch (const std::exception& e) {
                             cout << red << "General SQL Error: " << e.what() << resetColor << endl;
+                            hadError = true;
                         }
                     }
                 }
-                break;
-
+                if(hadError) {
+                    cout << bgGray << "Press ENTER to continue..." << resetColor << endl;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                }
+                cleanConsole();
                 break;
             }
 
@@ -129,19 +138,21 @@ void Menu::mainMenu(Database &database) {
     } while (choice != 0);
 }
 
-vector<string> Menu::readSQLQuery() {
+vector<pair<string, int>> Menu::readSQLQuery() {
     string query;
     string line;
-    vector<string> queries;
+    vector<pair<string, int>> queries;
     bool firstLine = true;
-    int counter = 0;
+    int lineCounter = 0;
     bool wasPreviousLineEmpty = false;
     bool hasTextBeenEntered = false;
+    int commandStartLine = 0;
+    bool expectSemicolon = false;
 
     cout << bgGray << "Enter your SQL query. Type \"EXIT\" to exit the console." << resetColor << endl;
     do {
         if (!firstLine) {
-            cout << bgGray << counter << "." << resetColor << " ";
+            cout << bgGray << lineCounter << "." << resetColor << " ";
         }
         getline(cin, line);
         if (line == "exit" || line == "EXIT") {
@@ -152,36 +163,52 @@ vector<string> Menu::readSQLQuery() {
             wasPreviousLineEmpty = false;
             string originalLine = line;
             highlightKeywords(line);
-            cout << "\033[A\033[2K";
-            cout << bgGray << counter << "." << resetColor << " " << line << endl;
-            query += originalLine + " ";
+            cout << "\033[A\033[2K";  // Clear the current line
+            cout << bgGray << lineCounter << "." << resetColor << " " << line << endl;
+            if (originalLine.find(';') != string::npos) {
+                stringstream ss(originalLine);
+                string segment;
+                while (getline(ss, segment, ';')) {
+                    string trimmedSegment = regex_replace(segment, regex("^\\s+|\\s+$"), "");
+                    if (!trimmedSegment.empty()) {
+                        queries.emplace_back(trimmedSegment, commandStartLine + 1);
+                    }
+                    expectSemicolon = false;
+                }
+                commandStartLine = lineCounter + 1;
+            } else {
+                query += originalLine + " ";
+                expectSemicolon = true;
+            }
         } else {
             if (wasPreviousLineEmpty && hasTextBeenEntered) {
+                if (!query.empty()) {
+                    queries.emplace_back(regex_replace(query, regex("^\\s+|\\s+$"), ""), commandStartLine + 1);
+                    query.clear();
+                }
                 break;
             }
             wasPreviousLineEmpty = true;
         }
-        counter++;
+        lineCounter++;
         firstLine = false;
     } while (true);
 
-    // Processing the entire query to split by ';'
-    stringstream ss(query);
-    string segment;
-    while (getline(ss, segment, ';')) {
-        string trimmedSegment = regex_replace(segment, regex("^\\s+|\\s+$"), "");
-        if (!trimmedSegment.empty()) {
-            queries.push_back(trimmedSegment);
+    if (!query.empty()) {  // Handle any remaining query part after the last non-empty line
+        queries.emplace_back(regex_replace(query, regex("^\\s+|\\s+$"), ""), commandStartLine + 1);
+        if(expectSemicolon) {
+            throw MissingSemicolonException("Missing semicolon at the end of the statement.", lineCounter);
         }
     }
-
-    cleanConsole();
     return queries;
 }
 
-shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
-    regex create_table_regex(R"(^\s*CREATE\s+TABLE\s+([a-zA-Z0-9_]+)\s*\(([^)]+)\)\s*$)", regex_constants::icase);
-    regex basic_create_table_pattern(R"(^\s*CREATE\s+TABLE\s+)", regex_constants::icase);
+
+shared_ptr<Statement> Menu::parseSQLQuery(const string &query, int line) { //todo InvalidArgumentsException i MissingSemicolonException
+    regex create_table_complete_regex(R"(^\s*CREATE\s+TABLE\s+([a-zA-Z0-9_]+)\s*\(([^)]+)\)\s*$)", regex_constants::icase);
+    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s*(?:([a-zA-Z0-9_]+)?\s*(\((.*)\))?)\s*$)", regex_constants::icase);
+    regex columns_syntax_regex(R"(^\(([^,()]+(?:,[^,()]+)*)\)$)", regex_constants::icase);
+
     regex drop_table_regex("^DROP TABLE.*", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
     regex insert_regex("^INSERT INTO.*", regex_constants::icase);
@@ -190,20 +217,22 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
     regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
 
-    if (regex_match(query, create_table_regex)) {
-        return make_shared<CreateTableStatement>(query);
-    }
-    else if (regex_search(query, basic_create_table_pattern)) {
-        if (!regex_search(query, regex("\\(([^)]+)\\)"))) {
-            throw MissingArgumentsException("Missing column definitions in CREATE TABLE statement.");
+    smatch matches;
+    if (regex_match(query, matches, create_table_basic_pattern)) {
+        if (matches[1].matched && matches[2].matched) {
+            string column_definitions = matches[2];
+            if (!regex_match(column_definitions, columns_syntax_regex)) {
+                throw InvalidArgumentsException("Invalid or improperly formatted column definitions in CREATE TABLE statement.", line); //fixme
+            }
+            return make_shared<CreateTableStatement>(query);
+        } else if (!matches[1].matched && !matches[2].matched) {
+            throw MissingArgumentsException("CREATE TABLE is missing table name and column definitions.", line);
+        } else if (!matches[1].matched) {
+            throw MissingArgumentsException("CREATE TABLE is missing table name.", line);
+        } else if (!matches[2].matched) {
+            throw MissingArgumentsException("CREATE TABLE is missing column definitions.", line);
         }
-        if (!regex_search(query, regex("[a-zA-Z0-9_]+\\s*\\("))) {
-            throw MissingArgumentsException("Missing table name in CREATE TABLE statement.");
-        }
-        throw InvalidArgumentsException("Invalid syntax in CREATE TABLE definition."); //other errors
     }
-
-
     else if (regex_match(query, drop_table_regex)) {
         return make_shared<DropTableStatement>(query);
     } else if (regex_match(query, select_regex)) {
@@ -219,9 +248,12 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
     } else if (regex_match(query, join_regex)) {
         return make_shared<InnerJoinStatement>(query);
     } else {
-        throw invalid_argument("Invalid SQL query"); //todo
+        throw SyntaxException("Unrecognized or unsupported SQL query.", line);
     }
+    return nullptr;
 }
+
+//<editor-fold desc="Utility functions">
 
 void Menu::highlightKeywords(string& line) {
     map<string, string> keywords = {
@@ -243,18 +275,21 @@ void Menu::highlightKeywords(string& line) {
             {"TABLES", magenta}
     };
 
-    for (const auto& keyword : keywords) {
-        regex keywordPattern("\\b" + keyword.first + "\\b", regex_constants::icase);
-        line = regex_replace(line, keywordPattern, keyword.second + keyword.first + resetColor);
+    for (const auto& [keyword, color] : keywords) {
+        regex keywordPattern("\\b" + keyword + "\\b", regex_constants::icase);
+        string replacement;
+        replacement.reserve(color.length() + keyword.length() + resetColor.length());
+        replacement.append(color).append(keyword).append(resetColor);
+        line = regex_replace(line, keywordPattern, replacement);
     }
 }
 
 void Menu::cleanConsole() {
-    #ifdef _WIN32
-            system("cls"); // For Windows
-    #else
-            system("clear"); // For Unix-based systems
-    #endif
+#ifdef _WIN32
+    system("cls"); // For Windows
+#else
+    system("clear"); // For Unix-based systems
+#endif
 }
 
 void Menu::finishProgram() {
@@ -267,4 +302,6 @@ void Menu::finishProgram() {
     ConsoleUtils::printLine({40}, '\xC0', '\xC4', '\xD9', green);
     exit(0);
 }
+
+//</editor-fold>
 

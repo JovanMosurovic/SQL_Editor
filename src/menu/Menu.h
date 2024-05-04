@@ -15,8 +15,8 @@ public:
 private:
     static void cleanConsole();
     static void finishProgram();
-    static vector<string> readSQLQuery();
-    static shared_ptr<Statement> parseSQLQuery(const string& query);
+    static vector<pair<string, int>> readSQLQuery();
+    static shared_ptr<Statement> parseSQLQuery(const string& query, int line);
     static void highlightKeywords(string& line);
 
 };
