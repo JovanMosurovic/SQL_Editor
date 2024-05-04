@@ -6,7 +6,7 @@
 
 class CreateTableStatement : public Statement {
     string tableName;
-    vector<string> columns;
+    vector<string> columnNames;
 
 public:
     CreateTableStatement(const string &query);

@@ -10,5 +10,5 @@ void ShowTablesStatement::execute(Database &db) {
 }
 
 bool ShowTablesStatement::parse() {
-    return false;
+    return true;
 }

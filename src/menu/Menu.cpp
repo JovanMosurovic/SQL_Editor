@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Colors.h"
 #include "Menu.h"
+#include "../exceptions/SyntaxExceptions.h"
 #include "../sql/CreateTableStatement.h"
 #include "../sql/DropTableStatement.h"
 #include "../sql/SelectStatement.h"
@@ -88,17 +89,24 @@ void Menu::mainMenu(Database &database) {
             case 1: {
                 cout << "You have selected the option \"EXECUTE SQL QUERY \"" << endl;
                 cleanConsole();
-                vector<string> queries = readSQLQuery(); // vector used in case there are multiple queries in one input
-                //print queries
+                vector<string> queries = readSQLQuery();
                 for(const auto& query : queries) {
-                    cout << query << endl;
-                }
-
-                for(const auto& query : queries) {
-                    if(query.empty()) {
-                        shared_ptr<Statement> statement = parseSQLQuery(query);
+                    if(!query.empty()) {
+                        try {
+                            shared_ptr<Statement> statement = parseSQLQuery(query);
+                            statement->execute(database);
+                        } catch (const MissingArgumentsException& e) {
+                            cout << red << "Missing Arguments Error: " << e.what() << resetColor << endl;
+                        } catch (const InvalidArgumentsException& e) {
+                            cout << red << "Invalid Arguments Error: " << e.what() << resetColor << endl;
+                        } catch (const SyntaxException& e) {
+                            cout << red << "Syntax Error: " << e.what() << resetColor << endl;
+                        } catch (const std::exception& e) {
+                            cout << red << "General SQL Error: " << e.what() << resetColor << endl;
+                        }
                     }
                 }
+                break;
 
                 break;
             }
@@ -124,11 +132,11 @@ void Menu::mainMenu(Database &database) {
 vector<string> Menu::readSQLQuery() {
     string query;
     string line;
-    bool wasPreviousLineEmpty = false;
-    bool hasTextBeenEntered = false;
     vector<string> queries;
     bool firstLine = true;
     int counter = 0;
+    bool wasPreviousLineEmpty = false;
+    bool hasTextBeenEntered = false;
 
     cout << bgGray << "Enter your SQL query. Type \"EXIT\" to exit the console." << resetColor << endl;
     do {
@@ -136,45 +144,44 @@ vector<string> Menu::readSQLQuery() {
             cout << bgGray << counter << "." << resetColor << " ";
         }
         getline(cin, line);
-        if(line == "exit" || line == "EXIT") {
+        if (line == "exit" || line == "EXIT") {
             break;
         }
         if (!line.empty()) {
-            wasPreviousLineEmpty = false;
             hasTextBeenEntered = true;
+            wasPreviousLineEmpty = false;
             string originalLine = line;
             highlightKeywords(line);
             cout << "\033[A\033[2K";
             cout << bgGray << counter << "." << resetColor << " " << line << endl;
-
-            // Replace multiple spaces with a single space
-            line = regex_replace(line, regex("\\s+"), " ");
-
-            // Split the line into separate queries based on ';'
-            stringstream ss(line);
-            string item;
-            while (getline(ss, item, ';')) {
-                if (!item.empty()) {
-                    queries.push_back(item);
-                }
-            }
-        } else if (counter > 1 && wasPreviousLineEmpty && hasTextBeenEntered) {
-            queries.push_back(query);
-            break;
+            query += originalLine + " ";
         } else {
+            if (wasPreviousLineEmpty && hasTextBeenEntered) {
+                break;
+            }
             wasPreviousLineEmpty = true;
         }
         counter++;
         firstLine = false;
     } while (true);
+
+    // Processing the entire query to split by ';'
+    stringstream ss(query);
+    string segment;
+    while (getline(ss, segment, ';')) {
+        string trimmedSegment = regex_replace(segment, regex("^\\s+|\\s+$"), "");
+        if (!trimmedSegment.empty()) {
+            queries.push_back(trimmedSegment);
+        }
+    }
+
     cleanConsole();
     return queries;
 }
 
-
-
 shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
-    regex create_table_regex("^CREATE TABLE ([a-zA-Z]+) \\(([^)]+)\\)$", regex_constants::icase);
+    regex create_table_regex(R"(^\s*CREATE\s+TABLE\s+([a-zA-Z0-9_]+)\s*\(([^)]+)\)\s*$)", regex_constants::icase);
+    regex basic_create_table_pattern(R"(^\s*CREATE\s+TABLE\s+)", regex_constants::icase);
     regex drop_table_regex("^DROP TABLE.*", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
     regex insert_regex("^INSERT INTO.*", regex_constants::icase);
@@ -185,7 +192,19 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
 
     if (regex_match(query, create_table_regex)) {
         return make_shared<CreateTableStatement>(query);
-    } else if (regex_match(query, drop_table_regex)) {
+    }
+    else if (regex_search(query, basic_create_table_pattern)) {
+        if (!regex_search(query, regex("\\(([^)]+)\\)"))) {
+            throw MissingArgumentsException("Missing column definitions in CREATE TABLE statement.");
+        }
+        if (!regex_search(query, regex("[a-zA-Z0-9_]+\\s*\\("))) {
+            throw MissingArgumentsException("Missing table name in CREATE TABLE statement.");
+        }
+        throw InvalidArgumentsException("Invalid syntax in CREATE TABLE definition."); //other errors
+    }
+
+
+    else if (regex_match(query, drop_table_regex)) {
         return make_shared<DropTableStatement>(query);
     } else if (regex_match(query, select_regex)) {
         return make_shared<SelectStatement>(query);
@@ -203,9 +222,6 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
         throw invalid_argument("Invalid SQL query"); //todo
     }
 }
-
-
-
 
 void Menu::highlightKeywords(string& line) {
     map<string, string> keywords = {
