@@ -219,19 +219,19 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query, int line) { //tod
 
     smatch matches;
     if (regex_match(query, matches, create_table_basic_pattern)) {
-        if (matches[1].matched && matches[2].matched) {
-            string column_definitions = matches[2];
-            if (!regex_match(column_definitions, columns_syntax_regex)) {
-                throw InvalidArgumentsException("Invalid or improperly formatted column definitions in CREATE TABLE statement.", line); //fixme
-            }
-            return make_shared<CreateTableStatement>(query);
-        } else if (!matches[1].matched && !matches[2].matched) {
+        string table_name = matches[1].str();
+        string column_definitions = matches[3].str();
+
+        if (!matches[1].matched && !matches[2].matched) {
             throw MissingArgumentsException("CREATE TABLE is missing table name and column definitions.", line);
         } else if (!matches[1].matched) {
             throw MissingArgumentsException("CREATE TABLE is missing table name.", line);
         } else if (!matches[2].matched) {
             throw MissingArgumentsException("CREATE TABLE is missing column definitions.", line);
+        } else if (!regex_match(column_definitions, columns_syntax_regex)) {
+            throw InvalidArgumentsException("Invalid or improperly formatted column definitions in CREATE TABLE statement.", line);
         }
+        return make_shared<CreateTableStatement>(query);
     }
     else if (regex_match(query, drop_table_regex)) {
         return make_shared<DropTableStatement>(query);
@@ -248,9 +248,8 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query, int line) { //tod
     } else if (regex_match(query, join_regex)) {
         return make_shared<InnerJoinStatement>(query);
     } else {
-        throw SyntaxException("Unrecognized or unsupported SQL query.", line);
+        throw SyntaxException("Invalid SQL syntax.", line);
     }
-    return nullptr;
 }
 
 //<editor-fold desc="Utility functions">
