@@ -13,11 +13,8 @@ void CreateTableStatement::execute(Database& db) {
     for (const auto& columnName : columnNames) {
         columns.emplace_back(columnName);
     }
-    try {
-        db.createTable(tableName, columns);
-    } catch (const std::exception& e) {
-        cout << "Error executing CREATE TABLE: " << e.what() << endl;
-    }
+    db.createTable(tableName, columns);
+
 }
 
 bool CreateTableStatement::parse() {

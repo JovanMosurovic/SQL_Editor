@@ -11,7 +11,7 @@ class Database {
     unordered_map<string, Table> tables;
 
 public:
-    Database(string name); //bez const?
+    Database(const string& name);
 
     void addTable(const Table& table);
 

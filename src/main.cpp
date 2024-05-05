@@ -9,6 +9,5 @@ int main() {
     } catch (const InvalidTableNameException& e) { // constructor of class Table
         cout << e.what() << endl;
     }
-
     return 0;
 }

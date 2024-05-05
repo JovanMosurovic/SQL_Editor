@@ -1,70 +1,48 @@
 
 #include "Table.h"
 
-Table::Table(const string& name, const vector<Column> &columns) {
-    regex tableName_pattern("^[A-Za-z]+$");
-    if (regex_match(name, tableName_pattern)) {
-        this->name = name;
-        this->columns = columns;
-    } else {
+Table::Table(const string &name, const vector<Column> &columns) {
+    regex tableName_pattern("^[A-Za-z_]+$");
+    if (!regex_match(name, tableName_pattern))
         throw InvalidTableNameException(name);
-    }
+    this->name = name;
+    this->columns = columns;
 }
 
 void Table::addRow(const vector<string> &rowData) {
-    try {
-        if (rowData.size() != columns.size()) {
-            throw InvalidDataForAddRowException(rowData.size(), columns.size());
-        }
-        rows.emplace_back(rowData);
-    } catch (const InvalidDataForAddRowException &e) {
-        cout << e.what() << endl;
-    } catch (const exception &e) {
-        cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
+    if (rowData.size() != columns.size()) {
+        throw InvalidDataForAddRowException(rowData.size(), columns.size());
     }
+    rows.emplace_back(rowData);
 }
 
 void Table::removeRow(const long long rowIndex) {
-    try {
-        if (rowIndex >= rows.size()) {
-            throw RowOutOfBoundsException(rowIndex, rows.size());
-        }
-        rows.erase(rows.begin() + rowIndex);
-    } catch (const RowOutOfBoundsException &e) {
-        cout << e.what() << endl;
-    } catch (const exception &e) {
-        cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
+    if (rowIndex >= rows.size()) {
+        throw RowOutOfBoundsException(rowIndex, rows.size());
     }
+    rows.erase(rows.begin() + rowIndex);
 }
 
 void Table::updateRow(const long long rowIndex, const vector<string> &newData) {
-    try {
-        if (rowIndex >= rows.size()) {
-            throw RowOutOfBoundsException(rowIndex, rows.size());
-        }
-        if (newData.size() != columns.size()) {
-            throw InvalidDataForUpdateException(newData.size(), columns.size());
-        }
-        rows[rowIndex].setData(newData);
-    } catch (const RowOutOfBoundsException &e) {
-        cout << e.what() << endl;
-    } catch (const InvalidDataForUpdateException &e) {
-        cout << e.what() << endl;
-    } catch (const exception &e) {
-        cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
+    if (rowIndex >= rows.size()) {
+        throw RowOutOfBoundsException(rowIndex, rows.size());
     }
+    if (newData.size() != columns.size()) {
+        throw InvalidDataForUpdateException(newData.size(), columns.size());
+    }
+    rows[rowIndex].setData(newData);
 }
 
 void Table::printTable() const {
     vector<string> columnNames;
     columnNames.reserve(columns.size());
-    for (const auto& column : columns) {
+    for (const auto &column: columns) {
         columnNames.push_back(column.getName());
     }
 
     vector<vector<string>> rowData;
     rowData.reserve(rows.size());
-    for (const auto& row : rows) {
+    for (const auto &row: rows) {
         rowData.push_back(row.getData());
     }
 
@@ -73,7 +51,7 @@ void Table::printTable() const {
     ConsoleUtils::printLine(columnWidths, '\xDA', '\xC2', '\xBF');
     ConsoleUtils::printRow(columnNames, columnWidths);
 
-    for (const auto & row : rows) {
+    for (const auto &row: rows) {
         ConsoleUtils::printLine(columnWidths, '\xC3', '\xC5', '\xB4');
         ConsoleUtils::printRow(row.getData(), columnWidths);
     }

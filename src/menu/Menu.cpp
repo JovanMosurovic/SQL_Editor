@@ -40,7 +40,7 @@ void Menu::importDatabaseMenu() {
                     if (databaseName.empty()) {
                         throw DatabaseNameException(databaseName);
                     }
-                    auto *database = new Database(databaseName);
+                    shared_ptr<Database> database = make_shared<Database>(databaseName);
                     cout << "Database \"" << databaseName << "\" has been " << green << "successfully" << resetColor << " created!" << endl;
                     mainMenu(*database);
                 } catch (const DatabaseNameException& e) {
@@ -91,39 +91,23 @@ void Menu::mainMenu(Database &database) {
                 cout << "You have selected the option \"EXECUTE SQL QUERY \"" << endl;
                 cleanConsole();
                 vector<pair<string, int>> queries = readSQLQuery();
-                bool hadError = false;
+                try {
                 for (const auto& [query, line] : queries) {
                     if (!query.empty()) {
-                        try {
                             shared_ptr<Statement> statement = parseSQLQuery(query, line);
                             statement->execute(database);
-                        } catch (const MissingArgumentsException& e) {
-                            cout << e.what() << endl;
-                            hadError = true;
-                        } catch (const InvalidArgumentsException& e) {
-                            cout << e.what() << endl;
-                            hadError = true;
-                        } catch (const SyntaxException& e) {
-                            cout << e.what() << endl;
-                            hadError = true;
-                        } catch (const exception& e) {
-                            cout << red << "General SQL Error: " << e.what() << resetColor << endl;
-                            hadError = true;
                         }
                     }
-                }
-                if(hadError) {
+                    cout << endl << bgGray << green << "All queries have been successfully executed!" << resetColor << endl;
+                    cout << bgGray << "Press ENTER to continue..." << resetColor << endl;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cleanConsole();
+                } catch (const exception& e) {
+                    cout << e.what() << endl;
                     cout << bgGray << "Press ENTER to continue..." << resetColor << endl;
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     cleanConsole();
                 }
-//                else { //fixme
-//                    cout << endl << bgGray << green << "All queries have been successfully executed!" << resetColor << endl;
-//                    cout << bgGray << "Press ENTER to continue..." << resetColor << endl;
-//                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-//                    cleanConsole();
-//                }
-
                 break;
             }
 
