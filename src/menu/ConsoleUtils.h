@@ -7,6 +7,7 @@
 #include "Colors.h"
 
 namespace ConsoleUtils {
+
     enum class TextAlignment {
         LEFT,
         CENTER,

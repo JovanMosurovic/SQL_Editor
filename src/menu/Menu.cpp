@@ -15,7 +15,7 @@
 using namespace std;
 
 void Menu::importDatabaseMenu() {
-    int choice;
+    string choice;
     do {
         ConsoleUtils::printLine({40}, '\xDA', '\xC4', '\xBF');
         ConsoleUtils::printRow({"MENU"}, {40});
@@ -28,51 +28,46 @@ void Menu::importDatabaseMenu() {
         ConsoleUtils::printLine({40}, '\xC0', '\xC4', '\xD9');
         cout << "\xB3" << "Enter a number to select your desired option: " << endl << "\xC4>";
         cin >> choice;
-     //   cleanConsole();
+        //   cleanConsole();
 
-        switch (choice) {
-            case 1: {
-                try {
-                    cout << "You have selected the option \"CREATE DATABASE\"" << endl;
-                    string databaseName;
-                    cout << "Enter the name of the database you want to create: " << endl << "\xC4>";
-                    cin >> databaseName;
-                    if (databaseName.empty()) {
-                        throw DatabaseNameException(databaseName);
-                    }
-                    shared_ptr<Database> database = make_shared<Database>(databaseName);
-                    cout << "Database \"" << databaseName << "\" has been " << green << "successfully" << resetColor << " created!" << endl;
-                    mainMenu(*database);
-                } catch (const DatabaseNameException& e) {
-                    cout << e.what() << endl;
-                } catch (const exception& e) {
-                    cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
+        if (choice == "1") {
+            try {
+                cout << "You have selected the option \"CREATE DATABASE\"" << endl;
+                string databaseName;
+                cout << "Enter the name of the database you want to create: " << endl << "\xC4>";
+                cin >> databaseName;
+                if (databaseName.empty()) {
+                    throw DatabaseNameException(databaseName);
                 }
-
-                break;
+                shared_ptr<Database> database = make_shared<Database>(databaseName);
+                cout << "Database \"" << databaseName << "\" has been " << green << "successfully" << resetColor
+                     << " created!" << endl;
+                mainMenu(*database);
+            } catch (const DatabaseNameException &e) {
+                cout << e.what() << endl;
+            } catch (const exception &e) {
+                cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
             }
 
-            case 2: {
-                cout << "You have selected the option \"IMPORT DATABASE FROM FILE\"" << endl;
-                getchar();
-                getchar();
-                //todo
-                break;
-            }
-
-            case 0:
-                finishProgram();
-                break;
-
-            default:
-                cout << "Wrong choice, please enter the numbers 1, 2 or 0 to exit." << endl;
+            break;
+        } else if (choice == "2") {
+            cout << "You have selected the option \"IMPORT DATABASE FROM FILE\"" << endl;
+            getchar();
+            getchar();
+            //todo
+            break;
+        } else if (choice == "0") {
+            finishProgram();
+            break;
+        } else {
+            cout << "Wrong choice, please enter the numbers 1, 2 or 0 to exit." << endl;
         }
 
-    } while (choice != 0);
+    } while (choice != "0");
 }
 
 void Menu::mainMenu(Database &database) {
-    int choice;
+    string choice;
     do {
         ConsoleUtils::printLine({40}, '\xDA', '\xC4', '\xBF');
         ConsoleUtils::printRow({"MENU"}, {40});
@@ -86,50 +81,51 @@ void Menu::mainMenu(Database &database) {
         cout << "\xB3" << "Enter a number to select your desired option: " << endl << "\xC4>";
         cin >> choice;
 
-        switch (choice) {
-            case 1: {
-                cout << "You have selected the option \"EXECUTE SQL QUERY \"" << endl;
-                cleanConsole();
-                vector<pair<string, int>> queries = readSQLQuery();
-                try {
-                for (const auto& [query, line] : queries) {
+        if (choice == "1") {
+            cout << "You have selected the option \"EXECUTE SQL QUERY \"" << endl;
+            cleanConsole();
+            vector<pair<string, int>> queries = readSQLQuery();
+            int currLine = 0;
+            try {
+                for (const auto &[query, line]: queries) {
+                    currLine = line;
                     if (!query.empty()) {
-                            shared_ptr<Statement> statement = parseSQLQuery(query, line);
-                            statement->execute(database);
-                        }
+                        shared_ptr<Statement> statement = parseSQLQuery(query);
+                        statement->execute(database);
                     }
-                    cout << endl << bgGray << green << "All queries have been successfully executed!" << resetColor << endl;
-                    cout << bgGray << "Press ENTER to continue..." << resetColor << endl;
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cleanConsole();
-                } catch (const exception& e) {
-                    cout << e.what() << endl;
-                    cout << bgGray << "Press ENTER to continue..." << resetColor << endl;
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cleanConsole();
                 }
-                break;
+                cout << endl << bgGray << green << "All queries have been successfully executed!" << resetColor << endl;
+                cout << bgGray << "Press ENTER to continue..." << resetColor << endl;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cleanConsole();
+            } catch (const exception &e) {
+                cout << "\033[1mLine " << currLine << " \033[0m\xC4\033[1m>\033[0m ";
+                cout << e.what() << endl;
+                cout << bgGray << "Press ENTER to continue..." << resetColor << endl;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cleanConsole();
             }
-
-            case 2: {
-                cout << "You have selected the option \"EXPORT DATABASE\"" << endl;
-                //exportDatabase();
-                //todo
-                break;
-            }
-
-            case 0:
-                finishProgram();
-                break;
-
-            default:
-                cout << "Wrong choice, please enter the numbers 1, 2 or 0 to exit." << endl;
+        } else if (choice == "2") {
+            cout << "You have selected the option \"EXPORT DATABASE\"" << endl;
+            //exportDatabase();
+            //todo
+        } else if (choice == "0") {
+            finishProgram();
+        } else {
+            cout << "Wrong choice, please enter the numbers 1, 2 or 0 to exit." << endl;
         }
 
-    } while (choice != 0);
+    } while (choice != "0");
 }
 
 vector<pair<string, int>> Menu::readSQLQuery() {
+    //1. CREATE TABLE jocke (string)
+    //2.
+    //3. SHOW TABLES
+    //4.
+    //5.
+    // kada se unese ovo ispisuje gresku na liniji 3 a ne na liniji 1 ( da fali ; )
+
     string query;
     string line;
     vector<pair<string, int>> queries;
@@ -138,7 +134,6 @@ vector<pair<string, int>> Menu::readSQLQuery() {
     bool wasPreviousLineEmpty = false;
     bool hasTextBeenEntered = false;
     int commandStartLine = 0;
-    bool expectSemicolon = false;
 
     cout << bgGray << "Enter your SQL query. Type \"EXIT\" to exit the console." << resetColor << endl;
     do {
@@ -164,20 +159,11 @@ vector<pair<string, int>> Menu::readSQLQuery() {
                     if (!trimmedSegment.empty()) {
                         queries.emplace_back(trimmedSegment, commandStartLine + 1);
                     }
-                    expectSemicolon = false;
                 }
                 commandStartLine = lineCounter + 1;
             } else {
                 query += originalLine + " ";
-                size_t found = query.find_first_of(" \n\t");
-                if (found != string::npos) {
-                    string firstWord = query.substr(0, found);
-                    transform(firstWord.begin(), firstWord.end(), firstWord.begin(), ::tolower); // Convert to lowercase
-                    if (query.substr(found).find(firstWord) != string::npos) {
-                        throw MissingSemicolonException("Missing semicolon at the end of the statement.", lineCounter);
-                    }
-                }
-                expectSemicolon = true;
+                commandStartLine = lineCounter - 1;
             }
         } else {
             if (wasPreviousLineEmpty && hasTextBeenEntered) {
@@ -195,18 +181,14 @@ vector<pair<string, int>> Menu::readSQLQuery() {
 
     if (!query.empty()) {  // Handle any remaining query part after the last non-empty line
         queries.emplace_back(regex_replace(query, regex("^\\s+|\\s+$"), ""), commandStartLine + 1);
-        if(expectSemicolon) {
-            throw MissingSemicolonException("Missing semicolon at the end of the statement.", lineCounter);
-        }
     }
     return queries;
 }
 
-
-shared_ptr<Statement> Menu::parseSQLQuery(const string &query, int line) { //fixme MissingSemicolonException
+shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme MissingSemicolonException
     // fixuj kada se unesu "" ili '', izvrsi se upit ali ne radi kako treba create table
-    regex create_table_complete_regex(R"(^\s*CREATE\s+TABLE\s+([a-zA-Z0-9_]+)\s*\(([^)]+)\)\s*$)", regex_constants::icase);
-    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s*(?:([a-zA-Z0-9_]+)?\s*(\((.*)\))?)\s*$)", regex_constants::icase);
+    regex create_table_complete_regex(R"(^\s*CREATE\s+TABLE\s+([a-zA-Z0-9_]+)\s*\(([^)]+)\)\s*$)",regex_constants::icase);
+    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s*(?:([a-zA-Z0-9_]+)?\s*(\((.*)\))?)\s*$)",regex_constants::icase);
     regex columns_syntax_regex(R"(^([^,()]+(?:,[^,()]+)*)$)", regex_constants::icase);
 
     regex drop_table_regex("^DROP TABLE.*", regex_constants::icase);
@@ -217,9 +199,11 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query, int line) { //fix
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
     regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
 
-    regex multipleKeywordsRegex(".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*", regex_constants::icase);
+    regex multipleKeywordsRegex(
+            ".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*",
+            regex_constants::icase);
 
-    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)", regex_constants::icase); // ovde sam ti uradio select
+    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",regex_constants::icase); // ovde sam ti uradio select
     regex invalidArgumentsFrom("\\s*FROM(?:\\s*| WHERE.*)", regex_constants::icase);
 
     smatch matches;
@@ -228,17 +212,16 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query, int line) { //fix
         string column_definitions = matches[3].str();
 
         if (!matches[1].matched && !matches[2].matched) {
-            throw MissingArgumentsException("CREATE TABLE is missing table name and column definitions.", line);
+            throw MissingArgumentsException("CREATE TABLE is missing table name and column definitions.");
         } else if (!matches[1].matched) {
-            throw MissingArgumentsException("CREATE TABLE is missing table name.", line);
+            throw MissingArgumentsException("CREATE TABLE is missing table name.");
         } else if (!matches[2].matched) {
-            throw MissingArgumentsException("CREATE TABLE is missing column definitions.", line);
+            throw MissingArgumentsException("CREATE TABLE is missing column definitions.");
         } else if (!regex_match(column_definitions, columns_syntax_regex)) {
-            throw InvalidArgumentsException("Invalid or improperly formatted column definitions in CREATE TABLE statement.", line);
+            throw InvalidArgumentsException("Invalid or improperly formatted column definitions in CREATE TABLE statement.");
         }
         return make_shared<CreateTableStatement>(query);
-    }
-    else if (regex_match(query, drop_table_regex)) {
+    } else if (regex_match(query, drop_table_regex)) {
         return make_shared<DropTableStatement>(query);
     } else if (regex_match(query, select_regex)) {
         return make_shared<SelectStatement>(query);
@@ -252,40 +235,40 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query, int line) { //fix
         return make_shared<ShowTablesStatement>(query);
     } else if (regex_match(query, join_regex)) {
         return make_shared<InnerJoinStatement>(query);
-    } else if(regex_match(query, multipleKeywordsRegex)) {
-        throw SyntaxException("Multiple keywords detected",line);
-    } else if(regex_search(query,invalidArgumentsSelect)) {
-        throw InvalidArgumentsException("Invalid SELECT Arguments",line);
-    } else if(regex_search(query,invalidArgumentsFrom)) {
-        throw InvalidArgumentsException("Invalid FROM Arguments",line);
+    } else if (regex_match(query, multipleKeywordsRegex)) {
+        throw SyntaxException("Multiple keywords detected");
+    } else if (regex_search(query, invalidArgumentsSelect)) {
+        throw InvalidArgumentsException("Invalid SELECT Arguments");
+    } else if (regex_search(query, invalidArgumentsFrom)) {
+        throw InvalidArgumentsException("Invalid FROM Arguments");
     } else {
-        throw SyntaxException("Invalid SQL syntax.", line);
+        throw SyntaxException("Invalid SQL syntax.");
     }
 }
 
 //<editor-fold desc="Utility functions">
 
-void Menu::highlightKeywords(string& line) {
+void Menu::highlightKeywords(string &line) {
     map<string, string> keywords = {
             {"SELECT", red},
-            {"FROM", red},
-            {"WHERE", red},
-            {"INNER", red},
-            {"JOIN", red},
-            {"ON", red},
+            {"FROM",   red},
+            {"WHERE",  red},
+            {"INNER",  red},
+            {"JOIN",   red},
+            {"ON",     red},
             {"CREATE", yellow},
-            {"TABLE", yellow},
-            {"DROP", yellow},
+            {"TABLE",  yellow},
+            {"DROP",   yellow},
             {"INSERT", yellow},
-            {"INTO", yellow},
+            {"INTO",   yellow},
             {"UPDATE", cyan},
-            {"SET", cyan},
+            {"SET",    cyan},
             {"DELETE", cyan},
-            {"SHOW", magenta},
+            {"SHOW",   magenta},
             {"TABLES", magenta}
     };
 
-    for (const auto& [keyword, color] : keywords) {
+    for (const auto &[keyword, color]: keywords) {
         regex keywordPattern("\\b" + keyword + "\\b", regex_constants::icase);
         string replacement;
         replacement.reserve(color.length() + keyword.length() + resetColor.length());
