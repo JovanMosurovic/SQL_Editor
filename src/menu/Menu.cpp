@@ -106,7 +106,7 @@ void Menu::mainMenu(Database &database) {
                         } catch (const SyntaxException& e) {
                             cout << e.what() << endl;
                             hadError = true;
-                        } catch (const std::exception& e) {
+                        } catch (const exception& e) {
                             cout << red << "General SQL Error: " << e.what() << resetColor << endl;
                             hadError = true;
                         }
@@ -115,8 +115,15 @@ void Menu::mainMenu(Database &database) {
                 if(hadError) {
                     cout << bgGray << "Press ENTER to continue..." << resetColor << endl;
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cleanConsole();
                 }
-                cleanConsole();
+//                else { //fixme
+//                    cout << endl << bgGray << green << "All queries have been successfully executed!" << resetColor << endl;
+//                    cout << bgGray << "Press ENTER to continue..." << resetColor << endl;
+//                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+//                    cleanConsole();
+//                }
+
                 break;
             }
 
@@ -178,6 +185,14 @@ vector<pair<string, int>> Menu::readSQLQuery() {
                 commandStartLine = lineCounter + 1;
             } else {
                 query += originalLine + " ";
+                size_t found = query.find_first_of(" \n\t");
+                if (found != string::npos) {
+                    string firstWord = query.substr(0, found);
+                    transform(firstWord.begin(), firstWord.end(), firstWord.begin(), ::tolower); // Convert to lowercase
+                    if (query.substr(found).find(firstWord) != string::npos) {
+                        throw MissingSemicolonException("Missing semicolon at the end of the statement.", lineCounter);
+                    }
+                }
                 expectSemicolon = true;
             }
         } else {
@@ -204,10 +219,11 @@ vector<pair<string, int>> Menu::readSQLQuery() {
 }
 
 
-shared_ptr<Statement> Menu::parseSQLQuery(const string &query, int line) { //todo InvalidArgumentsException i MissingSemicolonException
+shared_ptr<Statement> Menu::parseSQLQuery(const string &query, int line) { //fixme MissingSemicolonException
+    // fixuj kada se unesu "" ili '', izvrsi se upit ali ne radi kako treba create table
     regex create_table_complete_regex(R"(^\s*CREATE\s+TABLE\s+([a-zA-Z0-9_]+)\s*\(([^)]+)\)\s*$)", regex_constants::icase);
     regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s*(?:([a-zA-Z0-9_]+)?\s*(\((.*)\))?)\s*$)", regex_constants::icase);
-    regex columns_syntax_regex(R"(^\(([^,()]+(?:,[^,()]+)*)\)$)", regex_constants::icase);
+    regex columns_syntax_regex(R"(^([^,()]+(?:,[^,()]+)*)$)", regex_constants::icase);
 
     regex drop_table_regex("^DROP TABLE.*", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
@@ -216,6 +232,11 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query, int line) { //tod
     regex delete_regex("^DELETE FROM.*", regex_constants::icase);
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
     regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
+
+    regex multipleKeywordsRegex(".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*", regex_constants::icase);
+
+    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)", regex_constants::icase); // ovde sam ti uradio select
+    regex invalidArgumentsFrom("\\s*FROM(?:\\s*| WHERE.*)", regex_constants::icase);
 
     smatch matches;
     if (regex_match(query, matches, create_table_basic_pattern)) {
@@ -247,6 +268,12 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query, int line) { //tod
         return make_shared<ShowTablesStatement>(query);
     } else if (regex_match(query, join_regex)) {
         return make_shared<InnerJoinStatement>(query);
+    } else if(regex_match(query, multipleKeywordsRegex)) {
+        throw SyntaxException("Multiple keywords detected",line);
+    } else if(regex_search(query,invalidArgumentsSelect)) {
+        throw InvalidArgumentsException("Invalid SELECT Arguments",line);
+    } else if(regex_search(query,invalidArgumentsFrom)) {
+        throw InvalidArgumentsException("Invalid FROM Arguments",line);
     } else {
         throw SyntaxException("Invalid SQL syntax.", line);
     }

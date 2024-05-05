@@ -11,6 +11,7 @@ const std::string bold = "\033[1m"; // Bold
 // Standard colors
 const std::string red = "\033[1;31m"; // Red
 const std::string green = "\033[1;32m"; // Green
+const std::string darkGreen = "\033[0;32m"; // Dark green
 const std::string yellow = "\033[1;33m"; // Yellow
 const std::string blue = "\033[1;34m"; // Blue
 const std::string lightBlue = "\033[1;94m"; // Light blue
@@ -25,6 +26,7 @@ const std::string gray = "\033[1;90m"; // Gray
 const std::string bgBlack = "\033[1;40m"; // Black background
 const std::string bgRed = "\033[1;41m"; // Red background
 const std::string bgGreen = "\033[1;42m"; // Green background
+const std::string bgDarkGreen = "\033[1;32m"; // Dark green background
 const std::string bgYellow = "\033[1;43m"; // Yellow background
 const std::string bgBlue = "\033[1;44m"; // Blue background
 const std::string bgMagenta = "\033[1;45m"; // Magenta background

@@ -5,7 +5,6 @@ CreateTableStatement::CreateTableStatement(const string &query) : Statement(quer
 
 void CreateTableStatement::execute(Database& db) {
     if (!parse()) {
-        cout << "Syntax error in SQL query." << endl;
         return;
     }
     // converting column names to Column objects
