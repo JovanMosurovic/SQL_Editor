@@ -4,14 +4,21 @@
 DropTableStatement::DropTableStatement(const string &query) : Statement(query) {}
 
 bool DropTableStatement::parse() {
-    return true;
+    regex dropTableRegex(R"(^\s*DROP\s+TABLE\s+(\S+)\s*$)", regex_constants::icase);
+    smatch matches;
+    if(regex_search(query, matches, dropTableRegex) && matches.size() == 2) {
+        table_name = matches[1];
+        if (table_name.front() == '\'' || table_name.front() == '\"' || table_name.front() == '`') {
+            table_name = table_name.substr(1, table_name.size() - 2);
+        }
+        return true;
+    }
+    return false;
 }
 
 void DropTableStatement::execute(Database &db) {
     if(!parse()) {
-        cout << red << "Syntax error in SQL query." << resetColor << endl;
         return;
     }
-    db.dropTable(query);
-
+    db.dropTable(table_name);
 }

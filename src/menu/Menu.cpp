@@ -182,13 +182,13 @@ vector<pair<string, int>> Menu::readSQLQuery() {
 }
 
 shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme MissingSemicolonException
-    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)\s*\(([^)]+)\)\s*$)",regex_constants::icase);
+    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(?:\(([^)]+)\))?\s*$)",regex_constants::icase);
     regex columns_syntax_regex(R"(^([^,()]+(?:,[^,()]+)*)$)", regex_constants::icase);
     regex valid_quote_regex(R"((?:[^'"]*('[^']*'|"[^"]*"))*[^'"]*$)");
 
-    regex drop_table_regex("^DROP TABLE.*", regex_constants::icase);
+    regex drop_table_regex(R"(^\s*DROP\s+TABLE\s+(\S+)\s*$)", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
-    regex insert_regex("^INSERT INTO.*", regex_constants::icase);
+    regex insert_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s+(?:\(([^)]+)\))?\s+VALUES\s+(?:\(([^)]+)\))?$)", regex_constants::icase);
     regex update_regex("^UPDATE.*SET.*", regex_constants::icase);
     regex delete_regex("^DELETE FROM.*", regex_constants::icase);
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
@@ -227,6 +227,10 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
         }
         return make_shared<CreateTableStatement>(query);
     } else if (regex_match(query, drop_table_regex)) {
+        string table_name = matches[1].str();
+        if(!regex_match(table_name, valid_quote_regex)) {
+            throw SyntaxException("Mismatched or mixed quotes in table name.");
+        }
         return make_shared<DropTableStatement>(query);
     } else if (regex_match(query, select_regex)) {
         return make_shared<SelectStatement>(query);

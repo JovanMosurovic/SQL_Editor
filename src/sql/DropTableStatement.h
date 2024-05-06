@@ -5,6 +5,7 @@
 #include "Statement.h"
 
 class DropTableStatement : public Statement {
+string table_name;
 
 public:
     DropTableStatement(const string &query);

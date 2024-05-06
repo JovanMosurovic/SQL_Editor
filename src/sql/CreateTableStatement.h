@@ -11,8 +11,8 @@ class CreateTableStatement : public Statement {
 public:
     CreateTableStatement(const string &query);
 
-    void execute(Database &db) override;
     bool parse() override;
+    void execute(Database &db) override;
  //   bool errors() override;
 
 };
