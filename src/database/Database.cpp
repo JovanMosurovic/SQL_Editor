@@ -96,6 +96,9 @@ void Database::removeRowFromTable(const string &tableName, const long long rowIn
 void Database::printDatabase() {
     cout << endl << "Database: " << name << endl;
     cout << "Tables: " << endl;
+    if(tables.empty()) {
+        cout << " - No tables in database" << endl;
+    }
     for(auto it = tables.begin(); it != tables.end(); ++it) {
         cout << " - " << it->first << endl;
         it->second.printTable();
