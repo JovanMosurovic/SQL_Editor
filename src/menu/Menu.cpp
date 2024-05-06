@@ -1,16 +1,4 @@
-#include <iostream>
-#include <limits>
-#include "Colors.h"
 #include "Menu.h"
-#include "../exceptions/SyntaxExceptions.h"
-#include "../sql/CreateTableStatement.h"
-#include "../sql/DropTableStatement.h"
-#include "../sql/SelectStatement.h"
-#include "../sql/InnerJoinStatement.h"
-#include "../sql/InsertIntoStatement.h"
-#include "../sql/UpdateStatement.h"
-#include "../sql/DeleteFromStatement.h"
-#include "../sql/ShowTablesStatement.h"
 
 using namespace std;
 
@@ -107,8 +95,7 @@ void Menu::mainMenu(Database &database) {
             }
         } else if (choice == "2") {
             cout << "You have selected the option \"EXPORT DATABASE\"" << endl;
-            //exportDatabase();
-            //todo
+            exportDatabaseMenu(database);
         } else if (choice == "0") {
             finishProgram();
         } else {
@@ -116,6 +103,44 @@ void Menu::mainMenu(Database &database) {
         }
 
     } while (choice != "0");
+}
+
+void Menu::exportDatabaseMenu(Database &database) {
+    ConsoleUtils::printLine({40}, '\xDA', '\xC4', '\xBF');
+    ConsoleUtils::printRow({"MENU"}, {40});
+    ConsoleUtils::printLine({40}, '\xC3', '\xC5', '\xB4');
+    ConsoleUtils::printRow({"1. CUSTOM FORMAT EXPORT"}, {40}, ConsoleUtils::TextAlignment::LEFT);
+    ConsoleUtils::printLine({40}, '\xC3', '\xC5', '\xB4');
+    ConsoleUtils::printRow({"2. SQL FORMAT EXPORT"}, {40}, ConsoleUtils::TextAlignment::LEFT);
+    ConsoleUtils::printLine({40}, '\xC3', '\xC5', '\xB4');
+    ConsoleUtils::printRow({"0. GO BACK <\xC4"}, {40}, ConsoleUtils::TextAlignment::LEFT);
+    ConsoleUtils::printLine({40}, '\xC0', '\xC4', '\xD9');
+    cout << "\xB3" << "Enter a number to select your desired option: " << endl << "\xC4>";
+    string choice;
+    cin >> choice;
+
+    if(choice == "1" || choice == "2") {
+        cout << "Enter file path and name (e.g., C:/exports/mydatabase.sql): ";
+        string file_path;
+        cin >> file_path;
+        shared_ptr<Format> format;
+        if (choice == "1") {
+            format = make_shared<CustomFormat>();
+        } else {
+            format = make_shared<SQLFormat>();
+        }
+
+        try {
+            database.exportDatabase(*format, file_path);
+            cout << "Database exported successfully to " << file_path << endl;
+        } catch (const std::exception& e) {
+            cout << "Error exporting database: " << e.what() << endl;
+        }
+    } else if (choice == "0") {
+        return;
+    } else {
+        cout << "Wrong choice, please enter the numbers 1, 2 or 0 to exit." << endl;
+    }
 }
 
 vector<pair<string, int>> Menu::readSQLQuery() {

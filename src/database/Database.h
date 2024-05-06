@@ -3,8 +3,10 @@
 #define ELEMENTAL_SQL_IMPLEMENTATION_DATABASE_H
 
 #include <unordered_map>
+#include <fstream>
 #include "table/Table.h"
 #include "../exceptions/DatabaseExceptions.h"
+#include "../export/Format.h"
 
 class Database {
     string name;
@@ -26,6 +28,8 @@ public:
     void updateRowInTable(const string& tableName, long long rowIndex, const vector<string>& rowData);
 
     void removeRowFromTable(const string& tableName, long long rowIndex);
+
+    void exportDatabase(const Format& format, const string& filePath);
 
     void printDatabase();
 

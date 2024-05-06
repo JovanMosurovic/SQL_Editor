@@ -60,4 +60,18 @@ public:
     }
 };
 
+class FileNotOpenedException : public exception {
+    string message;
+
+public:
+    FileNotOpenedException(const string& filename)
+            : message("\033[1;31m[FILE OPENING FAILED]\033[0m Cannot open the file with the provided name.\n"
+                      "\033[1;31m\033[4mERROR\033[0m\033[1;31m: "
+                      "File \033[0m" + filename + "\033[1;31m cannot be opened.\033[0m") {}
+
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+};
+
 #endif //ELEMENTAL_SQL_IMPLEMENTATION_DATABASEEXCEPTIONS_H

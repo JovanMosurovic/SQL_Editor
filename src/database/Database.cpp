@@ -93,6 +93,21 @@ void Database::removeRowFromTable(const string &tableName, const long long rowIn
     it->second.removeRow(rowIndex);
 }
 
+void Database::exportDatabase(const Format& format, const string& filePath) {
+    ofstream file(filePath);
+    if (!file.is_open()) {
+        throw FileNotOpenedException(filePath);
+    }
+    for (const auto& pair : tables) {
+        const Table& table = pair.second;
+        file << format.formatTable(table) << endl;
+        for (const auto& row : table.getRows()) {
+            file << format.formatRow(row) << endl;
+        }
+    }
+    file.close();
+}
+
 void Database::printDatabase() {
     cout << endl << "Database: " << name << endl;
     cout << "Tables: " << endl;
