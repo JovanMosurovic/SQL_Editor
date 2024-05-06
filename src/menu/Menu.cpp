@@ -145,7 +145,7 @@ vector<pair<string, int>> Menu::readSQLQuery() {
             cout << "\033[A\033[2K";  // Clear the current line
             cout << bgGray << lineCounter << "." << resetColor << " " << line << endl;
 
-            if(query.empty()) {
+            if (query.empty()) {
                 commandStartLine = lineCounter;
             }
             query += originalLine + " ";
@@ -182,11 +182,9 @@ vector<pair<string, int>> Menu::readSQLQuery() {
 }
 
 shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme MissingSemicolonException
-    // fixuj kada se unesu "" ili '', izvrsi se upit ali ne radi kako treba create table
-    regex create_table_complete_regex(R"(^\s*CREATE\s+TABLE\s+([a-zA-Z0-9_]+)\s*\(([^)]+)\)\s*$)",regex_constants::icase);
-    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s*(?:([a-zA-Z0-9_]+)?\s*(\((.*)\))?)\s*$)",regex_constants::icase);
+    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)\s*\(([^)]+)\)\s*$)",regex_constants::icase);
     regex columns_syntax_regex(R"(^([^,()]+(?:,[^,()]+)*)$)", regex_constants::icase);
-    regex valid_quote_regex(R"((?:[^'"`]*('[^']*'|"[^"]*"|`[^`]*`))*[^'"`]*$)");
+    regex valid_quote_regex(R"((?:[^'"]*('[^']*'|"[^"]*"))*[^'"]*$)");
 
     regex drop_table_regex("^DROP TABLE.*", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
@@ -196,9 +194,7 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
     regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
 
-    regex multipleKeywordsRegex(
-            ".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*",
-            regex_constants::icase);
+    regex multipleKeywordsRegex(".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*",regex_constants::icase);
 
     regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",regex_constants::icase); // ovde sam ti uradio select
     regex invalidArgumentsFrom("\\s*FROM(?:\\s*| WHERE.*)", regex_constants::icase);
@@ -206,7 +202,9 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
     smatch matches;
     if (regex_match(query, matches, create_table_basic_pattern)) {
         string table_name = matches[1].str();
-        string column_definitions = matches[3].str();
+        string column_definitions = matches[2].str();
+        cout << "Table name: " << table_name << endl;
+        cout << "Column definitions: " << column_definitions << endl;
 
         if (!matches[1].matched && !matches[2].matched) {
             throw MissingArgumentsException("CREATE TABLE is missing table name and column definitions.");
@@ -214,8 +212,16 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
             throw MissingArgumentsException("CREATE TABLE is missing table name.");
         } else if (!matches[2].matched) {
             throw MissingArgumentsException("CREATE TABLE is missing column definitions.");
-        } else if (!regex_match(column_definitions, columns_syntax_regex)) {
+        }
+        // invalid column definitions
+        if (!regex_match(column_definitions, columns_syntax_regex)) {
             throw InvalidArgumentsException("Invalid or improperly formatted column definitions in CREATE TABLE statement.");
+        }
+        // quotes check
+        if(!regex_match(table_name, valid_quote_regex) && !regex_match(column_definitions, valid_quote_regex)) {
+            throw SyntaxException("Mismatched or mixed quotes in table name and column definitions.");
+        } else if (!regex_match(table_name, valid_quote_regex)) {
+            throw SyntaxException("Mismatched or mixed quotes in table name.");
         } else if (!regex_match(column_definitions, valid_quote_regex)) {
             throw SyntaxException("Mismatched or mixed quotes in column definitions.");
         }
