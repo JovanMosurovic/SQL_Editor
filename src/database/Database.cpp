@@ -41,6 +41,17 @@ void Database::addRowToTable(const string &tableName, const vector<string> &rowD
     it->second.addRow(rowData);
 }
 
+void Database::insertIntoTable(const string &tableName, const vector<string> &columnNames, const vector<string> &rowData) {
+    auto it = tables.find(tableName);
+    if (it == tables.end()) {
+        throw TableDoesNotExistException(tableName);
+    }
+    if (columnNames.size() != rowData.size()) {
+        throw InvalidDataForAddRowException(rowData.size(), columnNames.size());
+    }
+    it->second.addRow(rowData);
+}
+
 void Database::updateRowInTable(const string &tableName, const long long rowIndex, const vector<string> &rowData) {
     auto it = tables.find(tableName);
     if(it == tables.end()) {

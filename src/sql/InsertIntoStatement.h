@@ -5,6 +5,9 @@
 #include "Statement.h"
 
 class InsertIntoStatement : public Statement {
+    string table_name;
+    vector<string> column_names;
+    vector<string> values;
 
 public:
     InsertIntoStatement(const string &query);

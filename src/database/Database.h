@@ -21,6 +21,8 @@ public:
 
     void addRowToTable(const string& tableName, const vector<string>& rowData);
 
+    void insertIntoTable(const string& tableName, const vector<string>& columnNames, const vector<string>& rowData);
+
     void updateRowInTable(const string& tableName, long long rowIndex, const vector<string>& rowData);
 
     void removeRowFromTable(const string& tableName, long long rowIndex);
