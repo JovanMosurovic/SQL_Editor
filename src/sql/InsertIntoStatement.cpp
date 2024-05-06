@@ -41,10 +41,8 @@ bool InsertIntoStatement::parse() {
 }
 
 void InsertIntoStatement::execute(Database &db) {
-
     if(!parse()) {
         return;
     }
     db.insertIntoTable(table_name, column_names, values);
-
 }

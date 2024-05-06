@@ -4,6 +4,20 @@
 
 #include "TableExceptions.h"
 
+class DatabaseNameException : public exception {
+    string message;
+
+public:
+    DatabaseNameException(const string& databaseName)
+            : message("\033[1;31m[DATABASE CREATION FAILED]\033[0m Cannot create database with the provided name.\n"
+                      "\033[1;31m\033[4mERROR\033[0m\033[1;31m: "
+                      "Database name cannot be empty!\033[0m") {}
+
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+};
+
 class TableAlreadyExistsException : public exception {
     string message;
 
@@ -32,19 +46,18 @@ public:
     }
 };
 
-class DatabaseNameException : public exception {
+class ColumnDoesNotExistException : public exception {
     string message;
 
 public:
-    DatabaseNameException(const string& databaseName)
-            : message("\033[1;31m[DATABASE CREATION FAILED]\033[0m Cannot create database with the provided name.\n"
+    ColumnDoesNotExistException(const string& columnName)
+            : message("\033[1;31m[COLUMN ACCESS FAILED]\033[0m Cannot access column with the provided name.\n"
                       "\033[1;31m\033[4mERROR\033[0m\033[1;31m: "
-                      "Database name cannot be empty!\033[0m") {}
+                      "Column \033[0m" + columnName + "\033[1;31m does not exist in the table.\033[0m") {}
 
     const char* what() const noexcept override {
         return message.c_str();
     }
 };
-
 
 #endif //ELEMENTAL_SQL_IMPLEMENTATION_DATABASEEXCEPTIONS_H

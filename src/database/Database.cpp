@@ -49,7 +49,23 @@ void Database::insertIntoTable(const string &tableName, const vector<string> &co
     if (columnNames.size() != rowData.size()) {
         throw InvalidDataForAddRowException(rowData.size(), columnNames.size());
     }
-    it->second.addRow(rowData);
+
+    vector<string> actualColumnOrder;
+    for (const auto &column : it->second.getColumns()) {
+        actualColumnOrder.push_back(column.getName());
+    }
+
+    vector<string> reorderedData(actualColumnOrder.size());
+    for(size_t i = 0; i< columnNames.size(); i++) {
+        auto pos = find(actualColumnOrder.begin(), actualColumnOrder.end(), columnNames[i]);
+        if(pos != actualColumnOrder.end()) {
+            int index = distance(actualColumnOrder.begin(), pos);
+            reorderedData[index] = rowData[i];
+        } else {
+            throw ColumnDoesNotExistException(columnNames[i]);
+        }
+    }
+    it->second.addRow(reorderedData);
 }
 
 void Database::updateRowInTable(const string &tableName, const long long rowIndex, const vector<string> &rowData) {

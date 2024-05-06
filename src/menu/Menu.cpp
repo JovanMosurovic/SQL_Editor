@@ -188,7 +188,11 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
 
     regex drop_table_regex(R"(^\s*DROP\s+TABLE\s+(\S+)\s*$)", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
-    regex insert_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s+(?:\(([^)]+)\))?\s+VALUES\s+(?:\(([^)]+)\))?$)", regex_constants::icase);
+
+   // regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s+(?:\(([^)]+)\))?\s+VALUES\s+\(\s*(['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"]\s*)*)\)$)", regex_constants::icase);
+    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(?:\(([^)]+)\))?\s*VALUES\s*\(?\s*(['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"]\s*)*)?\)?\s*$)", regex_constants::icase);
+    regex values_syntax_regex(R"(\s*\((\S+)\s*(?:,\s*(\S+)\s*)*\s*\))", regex_constants::icase);
+
     regex update_regex("^UPDATE.*SET.*", regex_constants::icase);
     regex delete_regex("^DELETE FROM.*", regex_constants::icase);
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
@@ -203,8 +207,6 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
     if (regex_match(query, matches, create_table_basic_pattern)) {
         string table_name = matches[1].str();
         string column_definitions = matches[2].str();
-        cout << "Table name: " << table_name << endl;
-        cout << "Column definitions: " << column_definitions << endl;
 
         if (!matches[1].matched && !matches[2].matched) {
             throw MissingArgumentsException("CREATE TABLE is missing table name and column definitions.");
@@ -234,8 +236,41 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
         return make_shared<DropTableStatement>(query);
     } else if (regex_match(query, select_regex)) {
         return make_shared<SelectStatement>(query);
-    } else if (regex_match(query, insert_regex)) {
+    } else if (regex_match(query, matches, insert_into_regex)) {
+        string table_name = matches[1].str();
+        string column_list = matches[2].str();
+        string values_list = matches[3].str();
+
+        if (!matches[1].matched && !matches[2].matched && !matches[3].matched) {
+            throw MissingArgumentsException("INSERT INTO is missing table name, column list and values list.");
+        } else if (!matches[1].matched && !matches[2].matched) {
+            throw MissingArgumentsException("INSERT INTO is missing table name and column list.");
+        } else if (!matches[1].matched && !matches[3].matched) {
+            throw MissingArgumentsException("INSERT INTO is missing table name and values list.");
+        } else if (!matches[2].matched && !matches[3].matched) {
+            throw MissingArgumentsException("INSERT INTO is missing column list and values list.");
+        } else if (!matches[1].matched) {
+            throw MissingArgumentsException("INSERT INTO is missing table name.");
+        } else if (!matches[2].matched) {
+            throw MissingArgumentsException("INSERT INTO is missing column list.");
+        } else if (!matches[3].matched) {
+            throw MissingArgumentsException("INSERT INTO is missing values list.");
+        }
+        if (!regex_match(table_name, valid_quote_regex)) {
+            throw SyntaxException("Mismatched or mixed quotes in table name.");
+        } else if (!regex_match(column_list, valid_quote_regex)) {
+            throw SyntaxException("Mismatched or mixed quotes in column list.");
+        }  else if (!regex_match(values_list, values_syntax_regex)) {
+            if(!regex_match(values_list, valid_quote_regex)) {
+                throw SyntaxException("Mismatched or mixed quotes in values list.");
+            }
+        }
+        if (matches[2].matched && !regex_match(column_list, columns_syntax_regex)) {
+            throw SyntaxException("Invalid or improperly formatted column list in INSERT INTO statement.");
+        }
         return make_shared<InsertIntoStatement>(query);
+
+
     } else if (regex_match(query, update_regex)) {
         return make_shared<UpdateStatement>(query);
     } else if (regex_match(query, delete_regex)) {
@@ -270,6 +305,7 @@ void Menu::highlightKeywords(string &line) {
             {"DROP",   yellow},
             {"INSERT", yellow},
             {"INTO",   yellow},
+            {"VALUES", yellow},
             {"UPDATE", cyan},
             {"SET",    cyan},
             {"DELETE", cyan},
