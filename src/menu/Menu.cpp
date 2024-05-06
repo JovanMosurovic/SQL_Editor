@@ -119,13 +119,6 @@ void Menu::mainMenu(Database &database) {
 }
 
 vector<pair<string, int>> Menu::readSQLQuery() {
-    //1. CREATE TABLE jocke (string)
-    //2.
-    //3. SHOW TABLES
-    //4.
-    //5.
-    // kada se unese ovo ispisuje gresku na liniji 3 a ne na liniji 1 (missing ;)
-
     string query;
     string line;
     vector<pair<string, int>> queries;
@@ -193,6 +186,7 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
     regex create_table_complete_regex(R"(^\s*CREATE\s+TABLE\s+([a-zA-Z0-9_]+)\s*\(([^)]+)\)\s*$)",regex_constants::icase);
     regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s*(?:([a-zA-Z0-9_]+)?\s*(\((.*)\))?)\s*$)",regex_constants::icase);
     regex columns_syntax_regex(R"(^([^,()]+(?:,[^,()]+)*)$)", regex_constants::icase);
+    regex valid_quote_regex(R"((?:[^'"`]*('[^']*'|"[^"]*"|`[^`]*`))*[^'"`]*$)");
 
     regex drop_table_regex("^DROP TABLE.*", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
@@ -222,6 +216,8 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
             throw MissingArgumentsException("CREATE TABLE is missing column definitions.");
         } else if (!regex_match(column_definitions, columns_syntax_regex)) {
             throw InvalidArgumentsException("Invalid or improperly formatted column definitions in CREATE TABLE statement.");
+        } else if (!regex_match(column_definitions, valid_quote_regex)) {
+            throw SyntaxException("Mismatched or mixed quotes in column definitions.");
         }
         return make_shared<CreateTableStatement>(query);
     } else if (regex_match(query, drop_table_regex)) {
