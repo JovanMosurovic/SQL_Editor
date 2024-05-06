@@ -84,8 +84,8 @@ void Menu::mainMenu(Database &database) {
         if (choice == "1") {
             cout << "You have selected the option \"EXECUTE SQL QUERY \"" << endl;
             cleanConsole();
-            vector<pair<string, int>> queries = readSQLQuery();
             int currLine = 0;
+            vector<pair<string, int>> queries = readSQLQuery();
             try {
                 for (const auto &[query, line]: queries) {
                     currLine = line;
@@ -124,7 +124,7 @@ vector<pair<string, int>> Menu::readSQLQuery() {
     //3. SHOW TABLES
     //4.
     //5.
-    // kada se unese ovo ispisuje gresku na liniji 3 a ne na liniji 1 ( da fali ; )
+    // kada se unese ovo ispisuje gresku na liniji 3 a ne na liniji 1 (missing ;)
 
     string query;
     string line;
@@ -151,24 +151,27 @@ vector<pair<string, int>> Menu::readSQLQuery() {
             highlightKeywords(line);
             cout << "\033[A\033[2K";  // Clear the current line
             cout << bgGray << lineCounter << "." << resetColor << " " << line << endl;
+
+            if(query.empty()) {
+                commandStartLine = lineCounter;
+            }
+            query += originalLine + " ";
+
             if (originalLine.find(';') != string::npos) {
-                stringstream ss(originalLine);
+                stringstream ss(query);
                 string segment;
                 while (getline(ss, segment, ';')) {
                     string trimmedSegment = regex_replace(segment, regex("^\\s+|\\s+$"), "");
                     if (!trimmedSegment.empty()) {
-                        queries.emplace_back(trimmedSegment, commandStartLine + 1);
+                        queries.emplace_back(trimmedSegment, commandStartLine);
                     }
                 }
-                commandStartLine = lineCounter + 1;
-            } else {
-                query += originalLine + " ";
-                commandStartLine = lineCounter - 1;
+                query.clear();
             }
         } else {
             if (wasPreviousLineEmpty && hasTextBeenEntered) {
                 if (!query.empty()) {
-                    queries.emplace_back(regex_replace(query, regex("^\\s+|\\s+$"), ""), commandStartLine + 1);
+                    queries.emplace_back(regex_replace(query, regex("^\\s+|\\s+$"), ""), commandStartLine);
                     query.clear();
                 }
                 break;
@@ -180,7 +183,7 @@ vector<pair<string, int>> Menu::readSQLQuery() {
     } while (true);
 
     if (!query.empty()) {  // Handle any remaining query part after the last non-empty line
-        queries.emplace_back(regex_replace(query, regex("^\\s+|\\s+$"), ""), commandStartLine + 1);
+        queries.emplace_back(regex_replace(query, regex("^\\s+|\\s+$"), ""), commandStartLine);
     }
     return queries;
 }

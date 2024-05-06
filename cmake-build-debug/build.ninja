@@ -51,97 +51,97 @@ build cmake_object_order_depends_target_Elemental_SQL_Implementation: phony || C
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/main.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/main.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\main.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/menu/Menu.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/menu/Menu.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\menu\Menu.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\menu
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/database/table/Table.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/database/table/Table.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\database\table\Table.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\database\table
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/database/table/Row.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/database/table/Row.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\database\table\Row.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\database\table
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/database/table/Column.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/database/table/Column.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\database\table\Column.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\database\table
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/database/Database.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/database/Database.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\database\Database.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\database
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/Statement.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/sql/Statement.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\Statement.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/SelectStatement.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/sql/SelectStatement.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\SelectStatement.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/CreateTableStatement.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/sql/CreateTableStatement.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\CreateTableStatement.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/DropTableStatement.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/sql/DropTableStatement.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\DropTableStatement.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/InnerJoinStatement.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/sql/InnerJoinStatement.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\InnerJoinStatement.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/InsertIntoStatement.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/sql/InsertIntoStatement.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\InsertIntoStatement.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/UpdateStatement.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/sql/UpdateStatement.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\UpdateStatement.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/DeleteFromStatement.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/sql/DeleteFromStatement.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\DeleteFromStatement.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/ShowTablesStatement.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/sql/ShowTablesStatement.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\ShowTablesStatement.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql
 
 build CMakeFiles/Elemental_SQL_Implementation.dir/src/menu/ConsoleUtils.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/menu/ConsoleUtils.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
   DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\menu\ConsoleUtils.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\menu
 
@@ -200,6 +200,11 @@ build Elemental_SQL_Implementation: phony Elemental_SQL_Implementation.exe
 # Folder: E:/FAKS/Cetvrti semestar/POOP/Elemental_SQL_Implementation/cmake-build-debug
 
 build all: phony Elemental_SQL_Implementation.exe
+
+# =============================================================================
+# Unknown Build Time Dependencies.
+# Tell Ninja that they may appear as side effects of build rules
+# otherwise ordered by order-only dependencies.
 
 # =============================================================================
 # Built-in targets
