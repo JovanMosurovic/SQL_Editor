@@ -4,7 +4,8 @@
 DropTableStatement::DropTableStatement(const string &query) : Statement(query) {}
 
 bool DropTableStatement::parse() {
-    regex dropTableRegex(R"(^\s*DROP\s+TABLE\s+(\S+)\s*$)", regex_constants::icase);
+    errors();
+    regex dropTableRegex(R"(^\s*DROP\s+TABLE(?:\s+(\S+))?\s*$)", regex_constants::icase);
     smatch matches;
     if(!regex_search(query, matches, dropTableRegex) && matches.size() == 2) {
         return false;
@@ -24,7 +25,7 @@ void DropTableStatement::execute(Database &db) {
 }
 
 void DropTableStatement::errors() {
-    regex drop_table_regex(R"(^\s*DROP\s+TABLE\s+(\S+)\s*$)", regex_constants::icase);
+    regex drop_table_regex(R"(^\s*DROP\s+TABLE(?:\s+(\S+))?\s*$)", regex_constants::icase);
     smatch matches;
     regex_match(query, matches, drop_table_regex);
 
