@@ -9,7 +9,7 @@ class CustomFormat : public Format {
 public:
     string formatTable(const Table &table) const override;
 
-    string formatRow(const Row &row) const override;
+    string formatRow(const Table& table, const Row &row) const override;
 
 };
 

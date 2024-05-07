@@ -7,8 +7,8 @@
 
 class Format {
 public:
-    virtual std::string formatTable(const Table& table) const = 0;
-    virtual std::string formatRow(const Row& row) const = 0;
+    virtual string formatTable(const Table& table) const = 0;
+    virtual string formatRow(const Table& table, const Row& row) const = 0;
     virtual ~Format() = default;
 };
 

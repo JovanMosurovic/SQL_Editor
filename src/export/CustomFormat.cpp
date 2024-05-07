@@ -5,6 +5,6 @@ string CustomFormat::formatTable(const Table &table) const {
     return {};
 }
 
-string CustomFormat::formatRow(const Row &row) const {
+string CustomFormat::formatRow(const Table& table, const Row &row) const {
     return {};
 }

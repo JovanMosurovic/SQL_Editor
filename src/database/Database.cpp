@@ -102,7 +102,7 @@ void Database::exportDatabase(const Format& format, const string& filePath) {
         const Table& table = pair.second;
         file << format.formatTable(table) << endl;
         for (const auto& row : table.getRows()) {
-            file << format.formatRow(row) << endl;
+            file << format.formatRow(table, row) << endl;
         }
     }
     file.close();
