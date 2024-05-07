@@ -239,9 +239,9 @@ vector<pair<string, int>> Menu::readSQLQuery() {
 }
 
 shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme MissingSemicolonException
-    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+([^(\s]+)\s*(\(([^)]+)\))?\s*$)", regex_constants::icase);
+    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE(?:\s+([^(\s]*)\s*(\([^)]*\)?)?)?\s*$)", regex_constants::icase);
     regex drop_table_regex(R"(^\s*DROP\s+TABLE\s+(\S+)\s*$)", regex_constants::icase);
-    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s+(\(?([^)]+)\)?)?\s*VALUES\s*(\(?\s*([^)]*)\)?)?\s*$)",regex_constants::icase);
+    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(\(?([^)]+)\)?)?\s*VALUES\s*(\(?\s*([^)]*)\)?)?\s*$)",regex_constants::icase);
 
     regex select_regex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?\s*$)", regex_constants::icase);
     regex update_regex("^UPDATE.*SET.*", regex_constants::icase);
