@@ -13,6 +13,5 @@ bool ShowTablesStatement::parse() {
     return true;
 }
 
-bool ShowTablesStatement::errors() {
-    return false;
+void ShowTablesStatement::errors() {
 }

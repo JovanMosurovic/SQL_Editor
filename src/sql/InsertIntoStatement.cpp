@@ -47,6 +47,60 @@ void InsertIntoStatement::execute(Database &db) {
     db.insertIntoTable(table_name, column_names, values);
 }
 
-bool InsertIntoStatement::errors() {
-    return false;
+void InsertIntoStatement::errors() {
+    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s+(\(?([^)]+)\)?)?\s*VALUES\s*(\(?\s*([^)]*)\)?)?\s*$)",regex_constants::icase);
+    regex insert_into_values_with_quotes_regex(R"(^(['"].*['"](,\s*['"].*['"])*$))");
+    regex insert_into_values_syntax_regex(R"(\s*\((\S+)\s*(?:,\s*(\S+)\s*)*\s*\))", regex_constants::icase);
+    smatch matches;
+    regex_match(query, matches, insert_into_regex);
+
+    string table_name_for_errors = matches[1].str();
+    string column_list_with_brackets = matches[2].str();
+    string column_list = matches[3].str();
+    string values_list_with_brackets = matches[4].str();
+    string values_list = matches[5].str();
+
+    if (!matches[1].matched && !matches[2].matched && !matches[3].matched) {
+        throw MissingArgumentsException("INSERT INTO is missing table name, column list and values list.");
+    } else if (!matches[1].matched && !matches[2].matched) {
+        throw MissingArgumentsException("INSERT INTO is missing table name and column list.");
+    } else if (!matches[1].matched && !matches[3].matched) {
+        throw MissingArgumentsException("INSERT INTO is missing table name and values list.");
+    } else if (!matches[2].matched && !matches[3].matched) {
+        throw MissingArgumentsException("INSERT INTO is missing column list and values list.");
+    } else if (!matches[1].matched) {
+        throw MissingArgumentsException("INSERT INTO is missing table name.");
+    } else if (!matches[2].matched) {
+        throw MissingArgumentsException("INSERT INTO is missing column list.");
+    } else if (!matches[3].matched) {
+        throw MissingArgumentsException("INSERT INTO is missing values list.");
+    }
+    // quotes check
+    if (!regex_match(values_list, insert_into_values_with_quotes_regex)) {
+        throw SyntaxException("Values must be surrounded by quotes.");
+    }
+    if (!regex_match(table_name_for_errors, SyntaxRegexPatterns::VALID_QUOTE_REGEX)) {
+        throw SyntaxException("Mismatched or mixed quotes in table name.");
+    } else if (!regex_match(column_list, SyntaxRegexPatterns::VALID_QUOTE_REGEX)) {
+        throw SyntaxException("Mismatched or mixed quotes in column list.");
+    } else if (!regex_match(values_list, insert_into_values_syntax_regex)) {
+        if (!regex_match(values_list, SyntaxRegexPatterns::VALID_QUOTE_REGEX)) {
+            throw SyntaxException("Mismatched or mixed quotes in values list.");
+        }
+    }
+    //brackets check
+    if (!regex_match(column_list_with_brackets, SyntaxRegexPatterns::PAIRED_BRACKETS_REGEX)) {
+        throw SyntaxException("Mismatched parentheses in column list.");
+    } else if (!regex_match(values_list_with_brackets, SyntaxRegexPatterns::PAIRED_BRACKETS_REGEX)) {
+        throw SyntaxException("Mismatched parentheses in values list.");
+    } else if (!regex_match(column_list_with_brackets, SyntaxRegexPatterns::MUST_CONTAIN_PARENTHESES)) {
+        throw SyntaxException("Missing parentheses in column list.");
+    } else if (!regex_match(values_list_with_brackets, SyntaxRegexPatterns::MUST_CONTAIN_PARENTHESES)) {
+        throw SyntaxException("Missing parentheses in values list.");
+    }
+
+    if (matches[2].matched && !regex_match(column_list, SyntaxRegexPatterns::COLUMNS_SYNTAX_REGEX)) {
+        throw SyntaxException("Invalid or improperly formatted column list in INSERT INTO statement.");
+    }
+
 }

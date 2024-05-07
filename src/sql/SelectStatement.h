@@ -9,13 +9,16 @@
 using namespace std;
 
 class SelectStatement : public Statement {
+    string table_name;
+    string table_alias;
+    vector<string> column_names;
 
 public:
     SelectStatement(const string &query);
 
     bool parse() override;
     void execute(Database &db) override;
-    bool errors() override;
+    void errors() override;
 
 
 };

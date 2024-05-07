@@ -11,6 +11,5 @@ void UpdateStatement::execute(Database &db) {
 
 }
 
-bool UpdateStatement::errors() {
-    return false;
+void UpdateStatement::errors() {
 }

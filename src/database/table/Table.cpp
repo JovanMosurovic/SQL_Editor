@@ -13,7 +13,12 @@ void Table::addRow(const vector<string> &rowData) {
     if (rowData.size() != columns.size()) {
         throw InvalidDataForAddRowException(rowData.size(), columns.size());
     }
-    rows.emplace_back(rowData);
+    vector<string> columnNames;
+    columnNames.reserve(columns.size());
+    for (const auto &column: columns) {
+        columnNames.push_back(column.getName());
+    }
+    rows.emplace_back(columnNames, rowData);
 }
 
 void Table::removeRow(const long long rowIndex) {
@@ -31,6 +36,12 @@ void Table::updateRow(const long long rowIndex, const vector<string> &newData) {
         throw InvalidDataForUpdateException(newData.size(), columns.size());
     }
     rows[rowIndex].setData(newData);
+}
+
+bool Table::hasColumn(const string &columnName) const {
+    return any_of(columns.begin(), columns.end(), [&columnName](const Column &column) {
+        return column.getName() == columnName;
+    });
 }
 
 void Table::printTable() const {
@@ -65,6 +76,16 @@ const vector<Column> &Table::getColumns() const {
     return columns;
 }
 
+int Table::getColumnIndex(const string& columnName) const {
+    auto it = find_if(columns.begin(), columns.end(), [&columnName](const Column& column) {
+        return column.getName() == columnName;
+    });
+    if (it == columns.end()) {
+        throw ColumnDoesNotExistException(columnName);
+    }
+    return distance(columns.begin(), it);
+}
+
 const string &Table::getName() const {
     return name;
 }
@@ -72,5 +93,7 @@ const string &Table::getName() const {
 const vector<Row> &Table::getRows() const {
     return rows;
 }
+
+
 
 //</editor-fold>

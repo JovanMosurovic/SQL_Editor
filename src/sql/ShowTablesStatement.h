@@ -11,7 +11,7 @@ public:
 
     void execute(Database &db) override;
     bool parse() override;
-    bool errors() override;
+    void errors() override;
 
 };
 

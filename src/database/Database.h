@@ -29,6 +29,8 @@ public:
 
     void removeRowFromTable(const string& tableName, long long rowIndex);
 
+    void selectFromTable(const string& tableName, const string& tableAlias, const vector<string>& columnNames);
+
     void exportDatabase(const Format& format, const string& filePath);
 
     void printDatabase();
@@ -36,6 +38,8 @@ public:
     //<editor-fold desc="Getters">
 
     const string &getName() const;
+
+    Table& getTable(const string& tableName);
 
     //</editor-fold>
 

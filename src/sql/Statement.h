@@ -4,6 +4,8 @@
 
 #include <string>
 #include "../database/Database.h"
+#include "../utils/SyntaxRegexPatterns.h"
+#include "../exceptions/SyntaxExceptions.h"
 
 class Statement {
 protected:
@@ -15,7 +17,7 @@ public:
 
     virtual bool parse() = 0;
     virtual void execute(Database &db) = 0;
-    virtual bool errors() = 0;
+    virtual void errors() = 0;
 
 };
 

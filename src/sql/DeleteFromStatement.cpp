@@ -11,6 +11,5 @@ void DeleteFromStatement::execute(Database &db) {
 
 }
 
-bool DeleteFromStatement::errors() {
-    return false;
+void DeleteFromStatement::errors() {
 }

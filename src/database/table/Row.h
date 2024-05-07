@@ -4,16 +4,22 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
+#include "Column.h"
+#include "../../exceptions/TableExceptions.h"
 
 using namespace std;
 
 class Row {
+    vector<string> columnNames;
     vector<string> data;
 
 public:
-    Row(const vector<string> &data);
+    Row(const vector<string> &columnNames, const vector<string> &data);
 
     const vector<string> &getData() const;
+
+    string getColumnValue(const string& columnName) const;
 
     void setData(const vector<string> &data);
 

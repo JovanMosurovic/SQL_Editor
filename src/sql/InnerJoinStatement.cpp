@@ -11,6 +11,5 @@ void InnerJoinStatement::execute(Database &db) {
 
 }
 
-bool InnerJoinStatement::errors() {
-    return false;
+void InnerJoinStatement::errors() {
 }

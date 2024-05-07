@@ -29,12 +29,16 @@ public:
 
     void updateRow(long long rowIndex, const vector<string>& newData);
 
+    bool hasColumn(const string& columnName) const;
+
     void printTable() const;
 
 
     //<editor-fold desc="Getters">
 
     const vector<Column> &getColumns() const;
+
+    int getColumnIndex(const string& columnName) const;
 
     const string &getName() const;
 

@@ -23,6 +23,16 @@ void DropTableStatement::execute(Database &db) {
     db.dropTable(table_name);
 }
 
-bool DropTableStatement::errors() {
-    return false;
+void DropTableStatement::errors() {
+    regex drop_table_regex(R"(^\s*DROP\s+TABLE\s+(\S+)\s*$)", regex_constants::icase);
+    smatch matches;
+    regex_match(query, matches, drop_table_regex);
+
+    string table_name_for_errors = matches[1].str();
+    if (!matches[1].matched) {
+        throw MissingArgumentsException("DROP TABLE is missing table name.");
+    }
+    if (!regex_match(table_name_for_errors, SyntaxRegexPatterns::VALID_QUOTE_REGEX)) {
+        throw SyntaxException("Mismatched or mixed quotes in table name.");
+    }
 }

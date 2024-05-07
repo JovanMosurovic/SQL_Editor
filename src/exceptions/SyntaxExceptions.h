@@ -50,4 +50,16 @@ public:
         return message.c_str();
     }
 };
+
+class InvalidColumnReferenceException : public exception {
+    string message;
+
+public:
+    InvalidColumnReferenceException(const string& details)
+            : message("\033[1;31m[SYNTAX ERROR]\033[0m \033[1mInvalid column reference:\033[0m " + details) {}
+
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+};
 #endif //ELEMENTAL_SQL_IMPLEMENTATION_SYNTAXEXCEPTIONS_H

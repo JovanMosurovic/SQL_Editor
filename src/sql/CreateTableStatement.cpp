@@ -4,6 +4,7 @@
 CreateTableStatement::CreateTableStatement(const string &query) : Statement(query) {}
 
 bool CreateTableStatement::parse() {
+    errors();
     regex createTableRegex(R"(CREATE\s+TABLE\s+(['"`]?\w+['"`]?)\s*\(((?:\s*(?:\w+|['"`][^'"`]+['"`])\s*,?\s*)+)\))", regex_constants::icase);
     smatch matches;
     if (regex_search(query, matches, createTableRegex) && matches.size() == 3) {
@@ -44,7 +45,38 @@ void CreateTableStatement::execute(Database& db) {
     db.createTable(tableName, columns);
 }
 
-bool CreateTableStatement::errors() {
-    return false;
+void CreateTableStatement::errors() {
+    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+([^(\s]+)\s*(\(([^)]+)\))?\s*$)", regex_constants::icase);
+    smatch matches;
+    regex_match(query, matches, create_table_basic_pattern);
+    string table_name = matches[1].str();
+    string column_definitions_with_brackets = matches[2].str();
+    string column_definitions = matches[3].str();
+
+    if (!matches[1].matched && !matches[2].matched) {
+        throw MissingArgumentsException("CREATE TABLE is missing table name and column definitions.");
+    } else if (!matches[1].matched) {
+        throw MissingArgumentsException("CREATE TABLE is missing table name.");
+    } else if (!matches[2].matched) {
+        throw MissingArgumentsException("CREATE TABLE is missing column definitions.");
+    }
+    // quotes check
+    if (!regex_match(table_name, SyntaxRegexPatterns::VALID_QUOTE_REGEX) && !regex_match(column_definitions, SyntaxRegexPatterns::VALID_QUOTE_REGEX)) {
+        throw SyntaxException("Mismatched or mixed quotes in table name and column definitions.");
+    } else if (!regex_match(table_name, SyntaxRegexPatterns::VALID_QUOTE_REGEX)) {
+        throw SyntaxException("Mismatched or mixed quotes in table name.");
+    } else if (!regex_match(column_definitions, SyntaxRegexPatterns::VALID_QUOTE_REGEX)) {
+        throw SyntaxException("Mismatched or mixed quotes in column definitions.");
+    }
+    // brackets check
+    if (!regex_match(column_definitions_with_brackets, SyntaxRegexPatterns::PAIRED_BRACKETS_REGEX) ||
+        !regex_match(column_definitions_with_brackets, SyntaxRegexPatterns::MUST_CONTAIN_PARENTHESES)) {
+        throw SyntaxException("Mismatched parentheses in column definitions.");
+    }
+    // invalid column definitions
+    if (!regex_match(column_definitions, SyntaxRegexPatterns::COLUMNS_SYNTAX_REGEX)) {
+        throw InvalidArgumentsException(
+                "Invalid or improperly formatted column definitions in CREATE TABLE statement.");
+    }
 }
 
