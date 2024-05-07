@@ -29,6 +29,8 @@ public:
 
     void removeRowFromTable(const string& tableName, long long rowIndex);
 
+    void clearTable(const string& tableName);
+
     void selectFromTable(const string& tableName, const string& tableAlias, const vector<string>& columnNames);
 
     void exportDatabase(const Format& format, const string& filePath);

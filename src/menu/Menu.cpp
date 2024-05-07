@@ -290,6 +290,7 @@ void Menu::highlightKeywords(string &line) {
             {"INNER",  red},
             {"JOIN",   red},
             {"ON",     red},
+            {"DELETE", red},
             {"CREATE", yellow},
             {"TABLE",  yellow},
             {"DROP",   yellow},
@@ -298,7 +299,6 @@ void Menu::highlightKeywords(string &line) {
             {"VALUES", yellow},
             {"UPDATE", cyan},
             {"SET",    cyan},
-            {"DELETE", cyan},
             {"SHOW",   magenta},
             {"TABLES", magenta}
     };

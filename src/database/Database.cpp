@@ -93,6 +93,14 @@ void Database::removeRowFromTable(const string &tableName, const long long rowIn
     it->second.removeRow(rowIndex);
 }
 
+void Database::clearTable(const string &tableName) {
+    auto it = tables.find(tableName);
+    if (it == tables.end()) {
+        throw TableDoesNotExistException(tableName);
+    }
+    it->second.clearRows();
+}
+
 void Database::selectFromTable(const string &tableName, const string &tableAlias, const vector<string> &columnNames) {
     auto it = tables.find(tableName);
     if (it == tables.end()) {

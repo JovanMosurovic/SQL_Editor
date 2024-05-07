@@ -27,6 +27,8 @@ public:
 
     void removeRow(long long rowIndex);
 
+    void clearRows();
+
     void updateRow(long long rowIndex, const vector<string>& newData);
 
     bool hasColumn(const string& columnName) const;

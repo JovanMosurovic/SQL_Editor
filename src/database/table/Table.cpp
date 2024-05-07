@@ -28,6 +28,10 @@ void Table::removeRow(const long long rowIndex) {
     rows.erase(rows.begin() + rowIndex);
 }
 
+void Table::clearRows() {
+    rows.clear();
+}
+
 void Table::updateRow(const long long rowIndex, const vector<string> &newData) {
     if (rowIndex >= rows.size()) {
         throw RowOutOfBoundsException(rowIndex, rows.size());
@@ -93,7 +97,5 @@ const string &Table::getName() const {
 const vector<Row> &Table::getRows() const {
     return rows;
 }
-
-
 
 //</editor-fold>

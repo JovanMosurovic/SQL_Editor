@@ -5,6 +5,8 @@
 #include "Statement.h"
 
 class DeleteFromStatement : public Statement {
+    string table_name;
+    string where_condition;
 
 public:
     DeleteFromStatement(const string &query);

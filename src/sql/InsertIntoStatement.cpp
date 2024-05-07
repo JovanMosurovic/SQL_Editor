@@ -4,6 +4,7 @@
 InsertIntoStatement::InsertIntoStatement(const string &query) : Statement(query) {}
 
 bool InsertIntoStatement::parse() {
+    errors();
     regex insertIntoRegex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s+(?:\(([^)]+)\))?\s+VALUES\s+(?:\(([^)]+)\))?$)", regex_constants::icase);
     smatch matches;
     if (!regex_search(query, matches, insertIntoRegex) || matches.size() != 4) {
