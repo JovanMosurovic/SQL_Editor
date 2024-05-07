@@ -39,9 +39,19 @@ void Menu::importDatabaseMenu() {
             break;
         } else if (choice == "2") {
             cout << "You have selected the option \"IMPORT DATABASE FROM FILE\"" << endl;
-            getchar();
-            getchar();
-            //todo
+            cout << "Enter the file path and name (e.g., C:/exports/mydatabase.sql): " << endl << "\xC4>";
+            string file_path;
+            cin >> file_path;
+            if (file_path[0] == '\"' && file_path[file_path.size() - 1] == '\"') {
+                file_path = file_path.substr(1, file_path.size() - 2);
+            } else if (file_path[0] == '\'' && file_path[file_path.size() - 1] == '\'') {
+                file_path = file_path.substr(1, file_path.size() - 2);
+            }
+            regex validPathRegex(".*\\.(sql|dbexp)$");
+            if (!regex_match(file_path, validPathRegex)) {
+                cout << "Invalid file type. Please provide a valid file with .sql or .dbexp extension." << endl;
+                break;
+            }
             break;
         } else if (choice == "0") {
             finishProgram();
@@ -109,47 +119,51 @@ void Menu::mainMenu(Database &database) {
 }
 
 void Menu::exportDatabaseMenu(Database &database) {
-    ConsoleUtils::printLine({40}, '\xDA', '\xC4', '\xBF');
-    ConsoleUtils::printRow({"MENU"}, {40});
-    ConsoleUtils::printLine({40}, '\xC3', '\xC5', '\xB4');
-    ConsoleUtils::printRow({"1. CUSTOM FORMAT EXPORT"}, {40}, ConsoleUtils::TextAlignment::LEFT);
-    ConsoleUtils::printLine({40}, '\xC3', '\xC5', '\xB4');
-    ConsoleUtils::printRow({"2. SQL FORMAT EXPORT"}, {40}, ConsoleUtils::TextAlignment::LEFT);
-    ConsoleUtils::printLine({40}, '\xC3', '\xC5', '\xB4');
-    ConsoleUtils::printRow({"0. GO BACK <\xC4"}, {40}, ConsoleUtils::TextAlignment::LEFT);
-    ConsoleUtils::printLine({40}, '\xC0', '\xC4', '\xD9');
-    cout << "\xB3" << "Enter a number to select your desired option: " << endl << "\xC4>";
     string choice;
-    cin >> choice;
+    do {
+        ConsoleUtils::printLine({40}, '\xDA', '\xC4', '\xBF');
+        ConsoleUtils::printRow({"MENU"}, {40});
+        ConsoleUtils::printLine({40}, '\xC3', '\xC5', '\xB4');
+        ConsoleUtils::printRow({"1. CUSTOM FORMAT EXPORT"}, {40}, ConsoleUtils::TextAlignment::LEFT);
+        ConsoleUtils::printLine({40}, '\xC3', '\xC5', '\xB4');
+        ConsoleUtils::printRow({"2. SQL FORMAT EXPORT"}, {40}, ConsoleUtils::TextAlignment::LEFT);
+        ConsoleUtils::printLine({40}, '\xC3', '\xC5', '\xB4');
+        ConsoleUtils::printRow({"0. GO BACK <\xC4"}, {40}, ConsoleUtils::TextAlignment::LEFT);
+        ConsoleUtils::printLine({40}, '\xC0', '\xC4', '\xD9');
+        cout << "\xB3" << "Enter a number to select your desired option: " << endl << "\xC4>";
+        cin >> choice;
 
-    if (choice == "1" || choice == "2") {
-        cout << "\xB3" << "Enter file path and name (e.g., C:/exports/mydatabase.sql): " << endl << "\xC4>";
-        string file_path;
-        cin >> file_path;
-        if (file_path[0] == '\"' && file_path[file_path.size() - 1] == '\"') {
-            file_path = file_path.substr(1, file_path.size() - 2);
-        } else if (file_path[0] == '\'' && file_path[file_path.size() - 1] == '\'') {
-            file_path = file_path.substr(1, file_path.size() - 2);
-        }
-        regex validPathRegex(".*\\.sql$");
-        if (!regex_match(file_path, validPathRegex)) {
-            throw InvalidFileTypeException("Invalid file type. Please provide a valid name with .sql extension.");
-        }
-        shared_ptr<Format> format;
-        if (choice == "1") {
-            format = make_shared<CustomFormat>();
+        if (choice == "1" || choice == "2") {
+            cout << "\xB3" << "Enter file path and name (e.g., C:/exports/mydatabase.sql): " << endl << "\xC4>";
+            string file_path;
+            cin >> file_path;
+            if (file_path[0] == '\"' && file_path[file_path.size() - 1] == '\"') {
+                file_path = file_path.substr(1, file_path.size() - 2);
+            } else if (file_path[0] == '\'' && file_path[file_path.size() - 1] == '\'') {
+                file_path = file_path.substr(1, file_path.size() - 2);
+            }
+            shared_ptr<Format> format;
+            if (choice == "1") {
+                format = make_shared<CustomFormat>();
+            } else {
+                regex validPathRegex(".*\\.sql$");
+                if (!regex_match(file_path, validPathRegex)) {
+                    throw InvalidFileTypeException(
+                            "Invalid file type. Please provide a valid name with .sql extension.");
+                }
+                format = make_shared<SQLFormat>();
+            }
+
+            database.exportDatabase(*format, file_path);
+            cout << green << "Database exported successfully to " << resetColor << "\"" << file_path << "\"" << endl
+                 << endl;
+
+        } else if (choice == "0") {
+            return;
         } else {
-            format = make_shared<SQLFormat>();
+            cout << "Wrong choice, please enter the numbers 1, 2 or 0 to exit." << endl;
         }
-
-        database.exportDatabase(*format, file_path);
-        cout << green << "Database exported successfully to " << resetColor << "\"" << file_path << "\"" << endl << endl;
-
-    } else if (choice == "0") {
-        return;
-    } else {
-        cout << "Wrong choice, please enter the numbers 1, 2 or 0 to exit." << endl;
-    }
+    } while (choice != "0");
 }
 
 vector<pair<string, int>> Menu::readSQLQuery() {
