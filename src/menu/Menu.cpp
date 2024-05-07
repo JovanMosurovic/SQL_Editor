@@ -143,20 +143,29 @@ void Menu::exportDatabaseMenu(Database &database) {
                 file_path = file_path.substr(1, file_path.size() - 2);
             }
             shared_ptr<Format> format;
-            if (choice == "1") {
-                format = make_shared<CustomFormat>();
-            } else {
-                regex validPathRegex(".*\\.sql$");
-                if (!regex_match(file_path, validPathRegex)) {
-                    throw InvalidFileTypeException(
-                            "Invalid file type. Please provide a valid name with .sql extension.");
+            try {
+                if (choice == "1") {
+                    regex validPathRegex(".*\\.dbexp$");
+                    if (!regex_match(file_path, validPathRegex)) {
+                        throw InvalidFileExportException(
+                                "Invalid file path for exporting database. Please provide a valid path with .\033[1mdbexp\033[0m extension.");
+                    }
+                    format = make_shared<CustomFormat>();
+                } else {
+                    regex validPathRegex(".*\\.sql$");
+                    if (!regex_match(file_path, validPathRegex)) {
+                        throw InvalidFileExportException(
+                                "Invalid file path for exporting database. Please provide a valid path with .\033[1msql\033[0m extension.");
+                    }
+                    format = make_shared<SQLFormat>();
                 }
-                format = make_shared<SQLFormat>();
-            }
 
-            database.exportDatabase(*format, file_path);
-            cout << green << "Database exported successfully to " << resetColor << "\"" << file_path << "\"" << endl
-                 << endl;
+                database.exportDatabase(*format, file_path);
+                cout << green << "Database exported successfully to " << resetColor << "\"" << file_path << "\"" << endl
+                     << endl;
+            } catch (const InvalidFileExportException &e) {
+                cout << e.what() << endl;
+            }
 
         } else if (choice == "0") {
             return;
@@ -231,7 +240,7 @@ vector<pair<string, int>> Menu::readSQLQuery() {
 
 shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme MissingSemicolonException
     // old create table // regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(?:\(([^)]+)\))?\s*$)", regex_constants::icase);
-   // regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(?:\(?([^)]+)\)?)?\s*$)", regex_constants::icase);
+    // regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(?:\(?([^)]+)\)?)?\s*$)", regex_constants::icase);
     regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(\(?([^)]+)\)?)?\s*$)", regex_constants::icase);
     regex columns_syntax_regex(R"(^([^,()]+(?:,[^,()]+)*)$)", regex_constants::icase);
 
@@ -244,8 +253,9 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
     regex drop_table_regex(R"(^\s*DROP\s+TABLE\s+(\S+)\s*$)", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
 
-   // old insert into // regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(?:\(([^)]+)\))?\s*VALUES\s*\(?\s*(['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"]\s*)*)?\)?\s*$)",regex_constants::icase);
-    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s+(\(?([^)]+)\)?)?\s*VALUES\s*(\(?\s*([^)]*)\)?)?\s*$)",regex_constants::icase);
+    // old insert into // regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(?:\(([^)]+)\))?\s*VALUES\s*\(?\s*(['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"]\s*)*)?\)?\s*$)",regex_constants::icase);
+    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s+(\(?([^)]+)\)?)?\s*VALUES\s*(\(?\s*([^)]*)\)?)?\s*$)",
+                            regex_constants::icase);
     regex insert_into_values_syntax_regex(R"(\s*\((\S+)\s*(?:,\s*(\S+)\s*)*\s*\))", regex_constants::icase);
     regex insert_into_values_with_quotes_regex(R"(^(['"].*['"](,\s*['"].*['"])*$))");
 
@@ -254,9 +264,12 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
     regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
 
-    regex multipleKeywordsRegex(".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*",regex_constants::icase);
+    regex multipleKeywordsRegex(
+            ".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*",
+            regex_constants::icase);
 
-    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",regex_constants::icase); // ovde sam ti uradio select
+    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",
+                                 regex_constants::icase); // ovde sam ti uradio select
     regex invalidArgumentsFrom("\\s*FROM(?:\\s*| WHERE.*)", regex_constants::icase);
 
     smatch matches;
@@ -281,12 +294,14 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
             throw SyntaxException("Mismatched or mixed quotes in column definitions.");
         }
         // brackets check
-        if (!regex_match(column_definitions_with_brackets, paired_brackets_regex) || !regex_match(column_definitions_with_brackets, must_contain_parentheses)) {
+        if (!regex_match(column_definitions_with_brackets, paired_brackets_regex) ||
+            !regex_match(column_definitions_with_brackets, must_contain_parentheses)) {
             throw SyntaxException("Mismatched parentheses in column definitions.");
         }
         // invalid column definitions
         if (!regex_match(column_definitions, columns_syntax_regex)) {
-            throw InvalidArgumentsException("Invalid or improperly formatted column definitions in CREATE TABLE statement.");
+            throw InvalidArgumentsException(
+                    "Invalid or improperly formatted column definitions in CREATE TABLE statement.");
         }
         return make_shared<CreateTableStatement>(query);
     } else if (regex_match(query, drop_table_regex)) {

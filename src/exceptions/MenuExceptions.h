@@ -7,13 +7,13 @@
 
 using namespace std;
 
-class InvalidFileTypeException : public exception {
+class InvalidFileExportException : public exception {
     string message;
 
 public:
-    InvalidFileTypeException(const string& details)
-            : message("\033[1;31m[INVALID FILE TYPE ERROR]\033[0m Cannot export database to the provided file path.\n"
-                      "\033[1;31m\033[4mERROR\033[0m: " + details) {}
+    InvalidFileExportException(const string& details)
+            : message("\033[1;31m[INVALID FILE EXPORT]\033[0m Cannot export database to the provided file path.\n"
+                      "\033[1;31m\033[4mERROR\033[0m\033[1;31m:\033[0m " + details) {}
 
     const char* what() const noexcept override {
         return message.c_str();
