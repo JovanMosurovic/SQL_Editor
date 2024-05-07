@@ -16,7 +16,7 @@ string Row::getColumnValue(const string& columnName) const {
 }
 
 
-void Row::setData(const vector<string> &data) {
-    Row::data = data;
+void Row::setData(const vector<string> &data_) {
+    Row::data = data_;
 }
 

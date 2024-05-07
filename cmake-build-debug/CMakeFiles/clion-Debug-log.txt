@@ -5,6 +5,6 @@ CMake Warning (dev) at CMakeLists.txt:1 (project):
   both commands.
 This warning is for project developers.  Use -Wno-dev to suppress it.
 
--- Configuring done (0.3s)
+-- Configuring done (0.2s)
 -- Generating done (0.0s)
 -- Build files have been written to: E:/FAKS/Cetvrti semestar/POOP/Elemental_SQL_Implementation/cmake-build-debug

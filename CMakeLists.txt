@@ -18,9 +18,10 @@ add_executable(Elemental_SQL_Implementation src/main.cpp
         src/sql/DeleteFromStatement.cpp
         src/sql/ShowTablesStatement.cpp
         src/menu/ConsoleUtils.cpp
-        src/export/Format.cpp
         src/export/SQLFormat.cpp
         src/export/CustomFormat.cpp
         src/export/CustomFormat.h
         src/utils/SyntaxRegexPatterns.h
+        src/sql/filter/Filter.cpp
+        src/sql/filter/Filter.h
 )

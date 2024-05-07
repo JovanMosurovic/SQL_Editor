@@ -21,7 +21,7 @@ public:
 
     string getColumnValue(const string& columnName) const;
 
-    void setData(const vector<string> &data);
+    void setData(const vector<string> &data_);
 
 };
 
