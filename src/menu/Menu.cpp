@@ -216,15 +216,24 @@ vector<pair<string, int>> Menu::readSQLQuery() {
 }
 
 shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme MissingSemicolonException
-    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(?:\(([^)]+)\))?\s*$)", regex_constants::icase);
+    // old create table // regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(?:\(([^)]+)\))?\s*$)", regex_constants::icase);
+   // regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(?:\(?([^)]+)\)?)?\s*$)", regex_constants::icase);
+    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(\(?([^)]+)\)?)?\s*$)", regex_constants::icase);
     regex columns_syntax_regex(R"(^([^,()]+(?:,[^,()]+)*)$)", regex_constants::icase);
+
+    // general regex
+    regex must_contain_parentheses(R"(^.*\(.*\).*$)", regex_constants::icase);
+    regex must_contain_quotes(R"(^.*['"].*['"].*$)", regex_constants::icase);
     regex valid_quote_regex(R"((?:[^'"]*('[^']*'|"[^"]*"))*[^'"]*$)");
+    regex paired_brackets_regex(R"(^([^()]*\([^()]*\))*[^()]*$)");
 
     regex drop_table_regex(R"(^\s*DROP\s+TABLE\s+(\S+)\s*$)", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
 
-    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(?:\(([^)]+)\))?\s*VALUES\s*\(?\s*(['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"]\s*)*)?\)?\s*$)",regex_constants::icase);
-    regex values_syntax_regex(R"(\s*\((\S+)\s*(?:,\s*(\S+)\s*)*\s*\))", regex_constants::icase);
+   // old insert into // regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(?:\(([^)]+)\))?\s*VALUES\s*\(?\s*(['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"]\s*)*)?\)?\s*$)",regex_constants::icase);
+    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s+(\(?([^)]+)\)?)?\s*VALUES\s*(\(?\s*([^)]*)\)?)?\s*$)",regex_constants::icase);
+    regex insert_into_values_syntax_regex(R"(\s*\((\S+)\s*(?:,\s*(\S+)\s*)*\s*\))", regex_constants::icase);
+    regex insert_into_values_with_quotes_regex(R"(^(['"].*['"](,\s*['"].*['"])*$))");
 
     regex update_regex("^UPDATE.*SET.*", regex_constants::icase);
     regex delete_regex("^DELETE FROM.*", regex_constants::icase);
@@ -233,14 +242,14 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
 
     regex multipleKeywordsRegex(".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*",regex_constants::icase);
 
-    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",
-                                 regex_constants::icase); // ovde sam ti uradio select
+    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",regex_constants::icase); // ovde sam ti uradio select
     regex invalidArgumentsFrom("\\s*FROM(?:\\s*| WHERE.*)", regex_constants::icase);
 
     smatch matches;
     if (regex_match(query, matches, create_table_basic_pattern)) {
         string table_name = matches[1].str();
-        string column_definitions = matches[2].str();
+        string column_definitions_with_brackets = matches[2].str();
+        string column_definitions = matches[3].str();
 
         if (!matches[1].matched && !matches[2].matched) {
             throw MissingArgumentsException("CREATE TABLE is missing table name and column definitions.");
@@ -249,10 +258,6 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
         } else if (!matches[2].matched) {
             throw MissingArgumentsException("CREATE TABLE is missing column definitions.");
         }
-        // invalid column definitions
-        if (!regex_match(column_definitions, columns_syntax_regex)) {
-            throw InvalidArgumentsException("Invalid or improperly formatted column definitions in CREATE TABLE statement.");
-        }
         // quotes check
         if (!regex_match(table_name, valid_quote_regex) && !regex_match(column_definitions, valid_quote_regex)) {
             throw SyntaxException("Mismatched or mixed quotes in table name and column definitions.");
@@ -260,6 +265,14 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
             throw SyntaxException("Mismatched or mixed quotes in table name.");
         } else if (!regex_match(column_definitions, valid_quote_regex)) {
             throw SyntaxException("Mismatched or mixed quotes in column definitions.");
+        }
+        // brackets check
+        if (!regex_match(column_definitions_with_brackets, paired_brackets_regex) || !regex_match(column_definitions_with_brackets, must_contain_parentheses)) {
+            throw SyntaxException("Mismatched parentheses in column definitions.");
+        }
+        // invalid column definitions
+        if (!regex_match(column_definitions, columns_syntax_regex)) {
+            throw InvalidArgumentsException("Invalid or improperly formatted column definitions in CREATE TABLE statement.");
         }
         return make_shared<CreateTableStatement>(query);
     } else if (regex_match(query, drop_table_regex)) {
@@ -275,8 +288,10 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
         return make_shared<SelectStatement>(query);
     } else if (regex_match(query, matches, insert_into_regex)) {
         string table_name = matches[1].str();
-        string column_list = matches[2].str();
-        string values_list = matches[3].str();
+        string column_list_with_brackets = matches[2].str();
+        string column_list = matches[3].str();
+        string values_list_with_brackets = matches[4].str();
+        string values_list = matches[5].str();
 
         if (!matches[1].matched && !matches[2].matched && !matches[3].matched) {
             throw MissingArgumentsException("INSERT INTO is missing table name, column list and values list.");
@@ -293,20 +308,34 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
         } else if (!matches[3].matched) {
             throw MissingArgumentsException("INSERT INTO is missing values list.");
         }
+        // quotes check
+        if (!regex_match(values_list, insert_into_values_with_quotes_regex)) {
+            throw SyntaxException("Values must be surrounded by quotes.");
+        }
         if (!regex_match(table_name, valid_quote_regex)) {
             throw SyntaxException("Mismatched or mixed quotes in table name.");
         } else if (!regex_match(column_list, valid_quote_regex)) {
             throw SyntaxException("Mismatched or mixed quotes in column list.");
-        } else if (!regex_match(values_list, values_syntax_regex)) {
+        } else if (!regex_match(values_list, insert_into_values_syntax_regex)) {
             if (!regex_match(values_list, valid_quote_regex)) {
                 throw SyntaxException("Mismatched or mixed quotes in values list.");
             }
         }
+        //brackets check
+        if (!regex_match(column_list_with_brackets, paired_brackets_regex)) {
+            throw SyntaxException("Mismatched parentheses in column list.");
+        } else if (!regex_match(values_list_with_brackets, paired_brackets_regex)) {
+            throw SyntaxException("Mismatched parentheses in values list.");
+        } else if (!regex_match(column_list_with_brackets, must_contain_parentheses)) {
+            throw SyntaxException("Missing parentheses in column list.");
+        } else if (!regex_match(values_list_with_brackets, must_contain_parentheses)) {
+            throw SyntaxException("Missing parentheses in values list.");
+        }
+
         if (matches[2].matched && !regex_match(column_list, columns_syntax_regex)) {
             throw SyntaxException("Invalid or improperly formatted column list in INSERT INTO statement.");
         }
         return make_shared<InsertIntoStatement>(query);
-
 
     } else if (regex_match(query, update_regex)) {
         return make_shared<UpdateStatement>(query);
