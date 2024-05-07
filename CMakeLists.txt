@@ -22,4 +22,5 @@ add_executable(Elemental_SQL_Implementation src/main.cpp
         src/export/SQLFormat.cpp
         src/export/CustomFormat.cpp
         src/export/CustomFormat.h
+        src/utils/SyntaxRegexPatterns.h
 )

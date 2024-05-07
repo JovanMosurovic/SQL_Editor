@@ -7,6 +7,7 @@
 #include "Colors.h"
 #include "Menu.h"
 #include "ConsoleUtils.h"
+#include "../utils/SyntaxRegexPatterns.h"
 #include "../exceptions/MenuExceptions.h"
 #include "../database/Database.h"
 #include "../exceptions/SyntaxExceptions.h"

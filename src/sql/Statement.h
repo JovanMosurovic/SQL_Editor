@@ -15,6 +15,7 @@ public:
 
     virtual bool parse() = 0;
     virtual void execute(Database &db) = 0;
+  //  virtual bool errors() = 0;
 
 };
 

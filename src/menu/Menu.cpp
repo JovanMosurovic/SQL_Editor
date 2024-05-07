@@ -244,11 +244,7 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
     regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(\(?([^)]+)\)?)?\s*$)", regex_constants::icase);
     regex columns_syntax_regex(R"(^([^,()]+(?:,[^,()]+)*)$)", regex_constants::icase);
 
-    // general regex
-    regex must_contain_parentheses(R"(^.*\(.*\).*$)", regex_constants::icase);
-    regex must_contain_quotes(R"(^.*['"].*['"].*$)", regex_constants::icase);
-    regex valid_quote_regex(R"((?:[^'"]*('[^']*'|"[^"]*"))*[^'"]*$)");
-    regex paired_brackets_regex(R"(^([^()]*\([^()]*\))*[^()]*$)");
+
 
     regex drop_table_regex(R"(^\s*DROP\s+TABLE\s+(\S+)\s*$)", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
@@ -264,12 +260,9 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
     regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
 
-    regex multipleKeywordsRegex(
-            ".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*",
-            regex_constants::icase);
+    regex multipleKeywordsRegex(".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*",regex_constants::icase);
 
-    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",
-                                 regex_constants::icase); // ovde sam ti uradio select
+    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",regex_constants::icase); // ovde sam ti uradio select
     regex invalidArgumentsFrom("\\s*FROM(?:\\s*| WHERE.*)", regex_constants::icase);
 
     smatch matches;
@@ -286,16 +279,16 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
             throw MissingArgumentsException("CREATE TABLE is missing column definitions.");
         }
         // quotes check
-        if (!regex_match(table_name, valid_quote_regex) && !regex_match(column_definitions, valid_quote_regex)) {
+        if (!regex_match(table_name, SyntaxRegexpatterns::VALID_QUOTE_REGEX) && !regex_match(column_definitions, SyntaxRegexpatterns::VALID_QUOTE_REGEX)) {
             throw SyntaxException("Mismatched or mixed quotes in table name and column definitions.");
-        } else if (!regex_match(table_name, valid_quote_regex)) {
+        } else if (!regex_match(table_name, SyntaxRegexpatterns::VALID_QUOTE_REGEX)) {
             throw SyntaxException("Mismatched or mixed quotes in table name.");
-        } else if (!regex_match(column_definitions, valid_quote_regex)) {
+        } else if (!regex_match(column_definitions, SyntaxRegexpatterns::VALID_QUOTE_REGEX)) {
             throw SyntaxException("Mismatched or mixed quotes in column definitions.");
         }
         // brackets check
-        if (!regex_match(column_definitions_with_brackets, paired_brackets_regex) ||
-            !regex_match(column_definitions_with_brackets, must_contain_parentheses)) {
+        if (!regex_match(column_definitions_with_brackets, SyntaxRegexpatterns::PAIRED_BRACKETS_REGEX) ||
+            !regex_match(column_definitions_with_brackets, SyntaxRegexpatterns::MUST_CONTAIN_PARENTHESES)) {
             throw SyntaxException("Mismatched parentheses in column definitions.");
         }
         // invalid column definitions
@@ -309,7 +302,7 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
         if (!matches[1].matched) {
             throw MissingArgumentsException("DROP TABLE is missing table name.");
         }
-        if (!regex_match(table_name, valid_quote_regex)) {
+        if (!regex_match(table_name, SyntaxRegexpatterns::VALID_QUOTE_REGEX)) {
             throw SyntaxException("Mismatched or mixed quotes in table name.");
         }
         return make_shared<DropTableStatement>(query);
@@ -341,23 +334,23 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
         if (!regex_match(values_list, insert_into_values_with_quotes_regex)) {
             throw SyntaxException("Values must be surrounded by quotes.");
         }
-        if (!regex_match(table_name, valid_quote_regex)) {
+        if (!regex_match(table_name, SyntaxRegexpatterns::VALID_QUOTE_REGEX)) {
             throw SyntaxException("Mismatched or mixed quotes in table name.");
-        } else if (!regex_match(column_list, valid_quote_regex)) {
+        } else if (!regex_match(column_list, SyntaxRegexpatterns::VALID_QUOTE_REGEX)) {
             throw SyntaxException("Mismatched or mixed quotes in column list.");
         } else if (!regex_match(values_list, insert_into_values_syntax_regex)) {
-            if (!regex_match(values_list, valid_quote_regex)) {
+            if (!regex_match(values_list, SyntaxRegexpatterns::VALID_QUOTE_REGEX)) {
                 throw SyntaxException("Mismatched or mixed quotes in values list.");
             }
         }
         //brackets check
-        if (!regex_match(column_list_with_brackets, paired_brackets_regex)) {
+        if (!regex_match(column_list_with_brackets, SyntaxRegexpatterns::PAIRED_BRACKETS_REGEX)) {
             throw SyntaxException("Mismatched parentheses in column list.");
-        } else if (!regex_match(values_list_with_brackets, paired_brackets_regex)) {
+        } else if (!regex_match(values_list_with_brackets, SyntaxRegexpatterns::PAIRED_BRACKETS_REGEX)) {
             throw SyntaxException("Mismatched parentheses in values list.");
-        } else if (!regex_match(column_list_with_brackets, must_contain_parentheses)) {
+        } else if (!regex_match(column_list_with_brackets, SyntaxRegexpatterns::MUST_CONTAIN_PARENTHESES)) {
             throw SyntaxException("Missing parentheses in column list.");
-        } else if (!regex_match(values_list_with_brackets, must_contain_parentheses)) {
+        } else if (!regex_match(values_list_with_brackets, SyntaxRegexpatterns::MUST_CONTAIN_PARENTHESES)) {
             throw SyntaxException("Missing parentheses in values list.");
         }
 
