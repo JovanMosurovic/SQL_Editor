@@ -10,3 +10,7 @@ bool UpdateStatement::parse() {
 void UpdateStatement::execute(Database &db) {
 
 }
+
+bool UpdateStatement::errors() {
+    return false;
+}

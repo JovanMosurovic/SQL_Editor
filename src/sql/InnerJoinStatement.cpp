@@ -10,3 +10,7 @@ bool InnerJoinStatement::parse() {
 void InnerJoinStatement::execute(Database &db) {
 
 }
+
+bool InnerJoinStatement::errors() {
+    return false;
+}

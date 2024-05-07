@@ -44,3 +44,7 @@ void CreateTableStatement::execute(Database& db) {
     db.createTable(tableName, columns);
 }
 
+bool CreateTableStatement::errors() {
+    return false;
+}
+

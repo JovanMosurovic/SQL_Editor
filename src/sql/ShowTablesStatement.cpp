@@ -12,3 +12,7 @@ void ShowTablesStatement::execute(Database &db) {
 bool ShowTablesStatement::parse() {
     return true;
 }
+
+bool ShowTablesStatement::errors() {
+    return false;
+}

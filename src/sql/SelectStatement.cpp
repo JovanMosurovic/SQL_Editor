@@ -10,3 +10,7 @@ bool SelectStatement::parse() {
 void SelectStatement::execute(Database &db) {
 
 }
+
+bool SelectStatement::errors() {
+    return false;
+}

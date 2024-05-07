@@ -10,3 +10,7 @@ bool DeleteFromStatement::parse() {
 void DeleteFromStatement::execute(Database &db) {
 
 }
+
+bool DeleteFromStatement::errors() {
+    return false;
+}

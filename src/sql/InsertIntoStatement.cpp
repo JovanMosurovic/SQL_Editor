@@ -46,3 +46,7 @@ void InsertIntoStatement::execute(Database &db) {
     }
     db.insertIntoTable(table_name, column_names, values);
 }
+
+bool InsertIntoStatement::errors() {
+    return false;
+}

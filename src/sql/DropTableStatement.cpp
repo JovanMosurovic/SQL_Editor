@@ -22,3 +22,7 @@ void DropTableStatement::execute(Database &db) {
     }
     db.dropTable(table_name);
 }
+
+bool DropTableStatement::errors() {
+    return false;
+}
