@@ -36,7 +36,6 @@ void Menu::importDatabaseMenu() {
             } catch (const exception &e) {
                 cout << red << "Unexpected exception caught:\n" << e.what() << resetColor << endl;
             }
-
             break;
         } else if (choice == "2") {
             cout << "You have selected the option \"IMPORT DATABASE FROM FILE\"" << endl;
@@ -95,7 +94,11 @@ void Menu::mainMenu(Database &database) {
             }
         } else if (choice == "2") {
             cout << "You have selected the option \"EXPORT DATABASE\"" << endl;
-            exportDatabaseMenu(database);
+            try {
+                exportDatabaseMenu(database);
+            } catch (const exception &e) {
+                cout << e.what() << endl;
+            }
         } else if (choice == "0") {
             finishProgram();
         } else {
@@ -119,10 +122,19 @@ void Menu::exportDatabaseMenu(Database &database) {
     string choice;
     cin >> choice;
 
-    if(choice == "1" || choice == "2") {
-        cout << "Enter file path and name (e.g., C:/exports/mydatabase.sql): ";
+    if (choice == "1" || choice == "2") {
+        cout << "\xB3" << "Enter file path and name (e.g., C:/exports/mydatabase.sql): " << endl << "\xC4>";
         string file_path;
         cin >> file_path;
+        if (file_path[0] == '\"' && file_path[file_path.size() - 1] == '\"') {
+            file_path = file_path.substr(1, file_path.size() - 2);
+        } else if (file_path[0] == '\'' && file_path[file_path.size() - 1] == '\'') {
+            file_path = file_path.substr(1, file_path.size() - 2);
+        }
+        regex validPathRegex(".*\\.sql$");
+        if (!regex_match(file_path, validPathRegex)) {
+            throw InvalidFileTypeException("Invalid file type. Please provide a valid name with .sql extension.");
+        }
         shared_ptr<Format> format;
         if (choice == "1") {
             format = make_shared<CustomFormat>();
@@ -130,12 +142,9 @@ void Menu::exportDatabaseMenu(Database &database) {
             format = make_shared<SQLFormat>();
         }
 
-        try {
-            database.exportDatabase(*format, file_path);
-            cout << "Database exported successfully to " << file_path << endl;
-        } catch (const std::exception& e) {
-            cout << "Error exporting database: " << e.what() << endl;
-        }
+        database.exportDatabase(*format, file_path);
+        cout << green << "Database exported successfully to " << resetColor << "\"" << file_path << "\"" << endl << endl;
+
     } else if (choice == "0") {
         return;
     } else {
@@ -207,15 +216,17 @@ vector<pair<string, int>> Menu::readSQLQuery() {
 }
 
 shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme MissingSemicolonException
-    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(?:\(([^)]+)\))?\s*$)",regex_constants::icase);
+    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE\s+(\S+)?\s+(?:\(([^)]+)\))?\s*$)", regex_constants::icase);
     regex columns_syntax_regex(R"(^([^,()]+(?:,[^,()]+)*)$)", regex_constants::icase);
     regex valid_quote_regex(R"((?:[^'"]*('[^']*'|"[^"]*"))*[^'"]*$)");
 
     regex drop_table_regex(R"(^\s*DROP\s+TABLE\s+(\S+)\s*$)", regex_constants::icase);
     regex select_regex("^SELECT (.*) FROM ([a-zA-Z]+)( WHERE (.*) (AND (.*) )*)?$", regex_constants::icase);
 
-   // regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s+(?:\(([^)]+)\))?\s+VALUES\s+\(\s*(['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"]\s*)*)\)$)", regex_constants::icase);
-    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(?:\(([^)]+)\))?\s*VALUES\s*\(?\s*(['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"]\s*)*)?\)?\s*$)", regex_constants::icase);
+    // regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s+(?:\(([^)]+)\))?\s+VALUES\s+\(\s*(['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"]\s*)*)\)$)", regex_constants::icase);
+    regex insert_into_regex(
+            R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(?:\(([^)]+)\))?\s*VALUES\s*\(?\s*(['"]([^'"]+)['"]\s*(?:,\s*['"]([^'"]+)['"]\s*)*)?\)?\s*$)",
+            regex_constants::icase);
     regex values_syntax_regex(R"(\s*\((\S+)\s*(?:,\s*(\S+)\s*)*\s*\))", regex_constants::icase);
 
     regex update_regex("^UPDATE.*SET.*", regex_constants::icase);
@@ -223,9 +234,12 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
     regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
 
-    regex multipleKeywordsRegex(".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*",regex_constants::icase);
+    regex multipleKeywordsRegex(
+            ".*create.*create.*|.*select.*select.*|.*insert.*insert.*|.*drop.*drop.*|.*update.*update.*",
+            regex_constants::icase);
 
-    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",regex_constants::icase); // ovde sam ti uradio select
+    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",
+                                 regex_constants::icase); // ovde sam ti uradio select
     regex invalidArgumentsFrom("\\s*FROM(?:\\s*| WHERE.*)", regex_constants::icase);
 
     smatch matches;
@@ -242,10 +256,11 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
         }
         // invalid column definitions
         if (!regex_match(column_definitions, columns_syntax_regex)) {
-            throw InvalidArgumentsException("Invalid or improperly formatted column definitions in CREATE TABLE statement.");
+            throw InvalidArgumentsException(
+                    "Invalid or improperly formatted column definitions in CREATE TABLE statement.");
         }
         // quotes check
-        if(!regex_match(table_name, valid_quote_regex) && !regex_match(column_definitions, valid_quote_regex)) {
+        if (!regex_match(table_name, valid_quote_regex) && !regex_match(column_definitions, valid_quote_regex)) {
             throw SyntaxException("Mismatched or mixed quotes in table name and column definitions.");
         } else if (!regex_match(table_name, valid_quote_regex)) {
             throw SyntaxException("Mismatched or mixed quotes in table name.");
@@ -255,7 +270,7 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
         return make_shared<CreateTableStatement>(query);
     } else if (regex_match(query, drop_table_regex)) {
         string table_name = matches[1].str();
-        if(!regex_match(table_name, valid_quote_regex)) {
+        if (!regex_match(table_name, valid_quote_regex)) {
             throw SyntaxException("Mismatched or mixed quotes in table name.");
         }
         return make_shared<DropTableStatement>(query);
@@ -285,8 +300,8 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
             throw SyntaxException("Mismatched or mixed quotes in table name.");
         } else if (!regex_match(column_list, valid_quote_regex)) {
             throw SyntaxException("Mismatched or mixed quotes in column list.");
-        }  else if (!regex_match(values_list, values_syntax_regex)) {
-            if(!regex_match(values_list, valid_quote_regex)) {
+        } else if (!regex_match(values_list, values_syntax_regex)) {
+            if (!regex_match(values_list, valid_quote_regex)) {
                 throw SyntaxException("Mismatched or mixed quotes in values list.");
             }
         }
