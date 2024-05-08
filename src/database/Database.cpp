@@ -88,33 +88,6 @@ void Database::clearTable(const string &tableName) {
 }
 
 void Database::selectFromTable(const string &tableName, const string &tableAlias, const vector<string> &columnNames, const vector<shared_ptr<IFilter>>& filters) {
-    //<editor-fold desc="previous implementation">
-//    Table &table = getTable(tableName);
-//
-//    for(const auto &columnName : columnNames) {
-//        if(!table.hasColumn(columnName)) {
-//            throw ColumnDoesNotExistException(columnName);
-//        }
-//    }
-//
-//    vector<Column> selectedColumns;
-//    for(const auto &columnName : columnNames) {
-//        int columnIndex = table.getColumnIndex(columnName);
-//        selectedColumns.push_back(table.getColumns()[columnIndex]);
-//    }
-//    Table selectedTable(tableAlias, selectedColumns);
-//
-//    for (const auto &row : table.getRows()) {
-//        vector<string> selectedRow;
-//        selectedRow.reserve(columnNames.size());
-//        for (const auto &columnName : columnNames) {
-//            selectedRow.push_back(row.getData()[table.getColumnIndex(columnName)]);
-//        }
-//        selectedTable.addRow(selectedRow);
-//    }
-//
-//    selectedTable.printTable();
-    //</editor-fold>
     Table &table = getTable(tableName);
 
     for(const auto &columnName : columnNames) {
@@ -122,7 +95,6 @@ void Database::selectFromTable(const string &tableName, const string &tableAlias
             throw ColumnDoesNotExistException(columnName);
         }
     }
-
     vector<Column> selectedColumns;
     for(const auto &columnName : columnNames) {
         int columnIndex = table.getColumnIndex(columnName);
