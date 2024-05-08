@@ -35,6 +35,12 @@ void Table::removeRow(const long long rowIndex) {
     rows.erase(rows.begin() + rowIndex);
 }
 
+vector<Row>::iterator Table::removeRow(vector<Row>::iterator rowIt) {
+    if(rowIt == rows.end())
+        throw RowDoesNotExistException();
+    return rows.erase(rowIt);
+}
+
 void Table::clearRows() {
     rows.clear();
 }

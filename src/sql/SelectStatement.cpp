@@ -5,7 +5,6 @@ SelectStatement::SelectStatement(const string &query) : Statement(query) {}
 
 bool SelectStatement::parse() {
     // errors();
-    //  regex selectRegex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)\s*(\S*)\s*$)", regex_constants::icase);
     regex selectRegex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?\s*(?:WHERE\s+(.+))?\s*$)", regex_constants::icase);
     smatch matches;
     if (!regex_search(query, matches, selectRegex) || matches.size() < 4) {
@@ -42,12 +41,9 @@ bool SelectStatement::parse() {
         }
     }
 
-    cout << "Where Clause: " << matches[4] << "\n";
-
     if (matches.size() == 5) {
         parseWhereClause(matches[4]);
     }
-
 
     return true;
 }
@@ -87,9 +83,6 @@ void SelectStatement::parseWhereClause(const string &whereClause) {
     }
 }
 
-
-
-
 void SelectStatement::execute(Database &db) {
     if (!parse()) {
         return;
@@ -111,31 +104,18 @@ void SelectStatement::execute(Database &db) {
         }
     }
 
-    cout << "Table Name: " << table_name << endl;
-    cout << "Table Alias: " << table_alias << endl;
-    cout << "Selected Columns: ";
-    for (const auto &column : selectedColumns) {
-        cout << column << " ";
-    }
-    cout << endl;
-    cout << "Filters: ";
-    for (const auto &filter : filters) {
-        cout << filter->toString() << " : next filter : ";
-    }
-    cout << endl;
-
     db.selectFromTable(table_name, table_alias, selectedColumns, filters);
 }
 
 
 void SelectStatement::errors() {
-    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",regex_constants::icase);
-    regex invalidArgumentsFrom("\\s*FROM(?:\\s*| WHERE.*)", regex_constants::icase);
-
-    if (regex_search(query, invalidArgumentsSelect)) {
-        throw InvalidArgumentsException("Invalid SELECT Arguments");
-    } else if (regex_search(query, invalidArgumentsFrom)) {
-        throw InvalidArgumentsException("Invalid FROM Arguments");
+    if (regex_match(query, regex(R"(^\s*SELECT(?:\s+FROM.*|\s*))", regex_constants::icase))) {
+        throw MissingArgumentsException("SELECT has no arguments.");
+    } else if (!regex_match(query, regex(".*\\s+FROM\\s*.*", regex_constants::icase))) {
+        throw MissingArgumentsException("No FROM keyword specified.");
+    }
+    else if (!regex_search(query, regex(R"(.*\s+FROM\s+\w+\s*)", regex_constants::icase))) {
+        throw MissingArgumentsException("FROM has no arguments.");
     }
 
 }

@@ -29,6 +29,7 @@ public:
     void addRow(const vector<string>& rowData);
 
     void removeRow(long long rowIndex);
+    vector<Row>::iterator removeRow(vector<Row>::iterator rowIt);
 
     void clearRows();
 

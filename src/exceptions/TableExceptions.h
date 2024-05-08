@@ -44,6 +44,19 @@ public:
     }
 };
 
+class RowDoesNotExistException : public exception {
+    string message;
+
+public:
+    RowDoesNotExistException()
+            : message("\033[1;31m[ROW REMOVAL FAILED]\033[0m Cannot remove row that does not exist.\n"
+                      "\033[1;31m\033[4mERROR\033[0m\033[1;31m: The row does not exist in the table.\033[0m") {}
+
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+};
+
 class InvalidDataForAddRowException : public exception {
     string message;
 
