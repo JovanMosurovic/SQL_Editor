@@ -9,12 +9,9 @@ Table::Table(const string &name, const vector<Column> &columns) {
     this->columns = columns;
 }
 
-Table::Table(Table&& other) noexcept
-        : name(std::move(other.name)), columns(std::move(other.columns)), rows(std::move(other.rows)) {
-}
+Table::Table(Table&& other) noexcept : name(std::move(other.name)), columns(std::move(other.columns)), rows(std::move(other.rows)) {}
 
-Table::Table(const Table &other) : name(other.name), columns(other.columns), rows(other.rows) {
-}
+Table::Table(const Table &other) : name(other.name), columns(other.columns), rows(other.rows) {}
 
 void Table::addRow(const vector<string> &rowData) {
     if (rowData.size() != columns.size()) {
@@ -108,6 +105,10 @@ const string &Table::getName() const {
 }
 
 const vector<Row> &Table::getRows() const {
+    return rows;
+}
+
+vector<Row> &Table::getRows() {
     return rows;
 }
 

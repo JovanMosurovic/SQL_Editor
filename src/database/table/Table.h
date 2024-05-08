@@ -49,6 +49,7 @@ public:
     const string &getName() const;
 
     const vector<Row> &getRows() const;
+    vector<Row> &getRows();
 
     //</editor-fold>
 

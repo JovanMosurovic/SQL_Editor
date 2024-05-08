@@ -17,6 +17,8 @@ class Row {
 public:
     Row(const vector<string> &columnNames, const vector<string> &data);
 
+    void updateColumnValue(const string &columnName, const string &value);
+
     const vector<string> &getData() const;
 
     string getColumnValue(const string& columnName) const;
