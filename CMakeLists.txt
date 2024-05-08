@@ -28,8 +28,4 @@ add_executable(Elemental_SQL_Implementation src/main.cpp
         src/sql/filter/EqualityFilter.h
         src/sql/filter/InequalityFilter.cpp
         src/sql/filter/InequalityFilter.h
-        src/sql/filter/AndFilter.cpp
-        src/sql/filter/AndFilter.h
-        src/sql/filter/OrFilter.cpp
-        src/sql/filter/OrFilter.h
 )

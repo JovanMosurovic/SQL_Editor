@@ -5,8 +5,7 @@
 #include <string>
 #include <vector>
 #include "Statement.h"
-#include "filter/AndFilter.h"
-#include "filter/OrFilter.h"
+
 
 using namespace std;
 

@@ -169,18 +169,6 @@ build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/filter/InequalityFilte
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
   OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\filter
 
-build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/filter/AndFilter.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/sql/filter/AndFilter.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
-  DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\filter\AndFilter.cpp.obj.d
-  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
-  OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
-  OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\filter
-
-build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/filter/OrFilter.cpp.obj: CXX_COMPILER__Elemental_SQL_Implementation_unscanned_Debug E$:/FAKS/Cetvrti$ semestar/POOP/Elemental_SQL_Implementation/src/sql/filter/OrFilter.cpp || cmake_object_order_depends_target_Elemental_SQL_Implementation
-  DEP_FILE = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\filter\OrFilter.cpp.obj.d
-  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
-  OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
-  OBJECT_FILE_DIR = CMakeFiles\Elemental_SQL_Implementation.dir\src\sql\filter
-
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Elemental_SQL_Implementation
@@ -189,7 +177,7 @@ build CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/filter/OrFilter.cpp.ob
 #############################################
 # Link the executable Elemental_SQL_Implementation.exe
 
-build Elemental_SQL_Implementation.exe: CXX_EXECUTABLE_LINKER__Elemental_SQL_Implementation_Debug CMakeFiles/Elemental_SQL_Implementation.dir/src/main.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/menu/Menu.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/database/table/Table.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/database/table/Row.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/database/table/Column.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/database/Database.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/Statement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/SelectStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/CreateTableStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/DropTableStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/InnerJoinStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/InsertIntoStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/UpdateStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/DeleteFromStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/ShowTablesStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/menu/ConsoleUtils.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/export/SQLFormat.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/export/CustomFormat.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/filter/EqualityFilter.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/filter/InequalityFilter.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/filter/AndFilter.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/filter/OrFilter.cpp.obj
+build Elemental_SQL_Implementation.exe: CXX_EXECUTABLE_LINKER__Elemental_SQL_Implementation_Debug CMakeFiles/Elemental_SQL_Implementation.dir/src/main.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/menu/Menu.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/database/table/Table.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/database/table/Row.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/database/table/Column.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/database/Database.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/Statement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/SelectStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/CreateTableStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/DropTableStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/InnerJoinStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/InsertIntoStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/UpdateStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/DeleteFromStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/ShowTablesStatement.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/menu/ConsoleUtils.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/export/SQLFormat.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/export/CustomFormat.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/filter/EqualityFilter.cpp.obj CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/filter/InequalityFilter.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Elemental_SQL_Implementation.dir
