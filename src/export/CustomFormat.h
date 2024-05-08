@@ -7,9 +7,16 @@
 class CustomFormat : public Format {
 
 public:
-    string formatTable(const Table &table) const override;
 
+    string formatDatabaseName(const string& databaseName) const;
+    string formatTable(const Table &table) const override;
     string formatRow(const Table& table, const Row &row) const override;
+
+    string parseDatabaseName(const string& line) const;
+
+    Table parseTable(const string &line) const override;
+
+    vector<string> parseRow(const string &line) const override;
 
 };
 

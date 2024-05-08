@@ -60,4 +60,18 @@ public:
     }
 };
 
+class InvalidFormatException : public exception {
+    string message;
+
+public:
+    InvalidFormatException(const string& message)
+            : message("\033[1;31m[INVALID FORMAT ERROR]\033[0m Cannot parse the provided format.\n"
+                      "\033[1;31m\033[4mERROR\033[0m\033[1;31m: "
+                      + message + "\033[0m") {}
+
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+};
+
 #endif //ELEMENTAL_SQL_IMPLEMENTATION_DATABASEEXCEPTIONS_H

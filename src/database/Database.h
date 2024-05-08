@@ -6,7 +6,8 @@
 #include <fstream>
 #include "table/Table.h"
 #include "../exceptions/DatabaseExceptions.h"
-#include "../export/Format.h"
+#include "../export/CustomFormat.h"
+#include "../export/SQLFormat.h"
 
 class Database {
     string name;
@@ -33,6 +34,7 @@ public:
 
     void selectFromTable(const string& tableName, const string& tableAlias, const vector<string>& columnNames);
 
+    void importDatabase(const Format& format, const string& filePath);
     void exportDatabase(const Format& format, const string& filePath);
 
     void printDatabase();

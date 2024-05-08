@@ -22,6 +22,9 @@ class Table {
 
 public:
     Table(const string& name, const vector<Column> &columns);
+    Table(Table&& other) noexcept;
+    // copy constructor
+    Table(const Table& other);
 
     void addRow(const vector<string>& rowData);
 

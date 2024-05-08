@@ -9,6 +9,14 @@ Table::Table(const string &name, const vector<Column> &columns) {
     this->columns = columns;
 }
 
+Table::Table(Table&& other) noexcept
+        : name(std::move(other.name)), columns(std::move(other.columns)), rows(std::move(other.rows)) {
+    // After moving, the other object's vectors are empty, and its strings are empty.
+}
+
+Table::Table(const Table &other) : name(other.name), columns(other.columns), rows(other.rows) {
+}
+
 void Table::addRow(const vector<string> &rowData) {
     if (rowData.size() != columns.size()) {
         throw InvalidDataForAddRowException(rowData.size(), columns.size());

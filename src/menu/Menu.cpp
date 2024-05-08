@@ -16,7 +16,7 @@ void Menu::importDatabaseMenu() {
         ConsoleUtils::printLine({40}, '\xC0', '\xC4', '\xD9');
         cout << "\xB3" << "Enter a number to select your desired option: " << endl << "\xC4>";
         cin >> choice;
-        //   cleanConsole();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         if (choice == "1") {
             try {
@@ -28,8 +28,7 @@ void Menu::importDatabaseMenu() {
                     throw DatabaseNameException(databaseName);
                 }
                 shared_ptr<Database> database = make_shared<Database>(databaseName);
-                cout << "Database \"" << databaseName << "\" has been " << green << "successfully" << resetColor
-                     << " created!" << endl;
+                cout << "Database \"" << databaseName << "\" has been " << green << "successfully" << resetColor << " created!" << endl;
                 mainMenu(*database);
             } catch (const DatabaseNameException &e) {
                 cout << e.what() << endl;
@@ -47,10 +46,32 @@ void Menu::importDatabaseMenu() {
             } else if (file_path[0] == '\'' && file_path[file_path.size() - 1] == '\'') {
                 file_path = file_path.substr(1, file_path.size() - 2);
             }
-            regex validPathRegex(".*\\.(sql|dbexp)$");
-            if (!regex_match(file_path, validPathRegex)) {
-                cout << "Invalid file type. Please provide a valid file with .sql or .dbexp extension." << endl;
-                break;
+
+            try {
+                shared_ptr<Format> format;
+                regex validPathRegex(".*\\.(dbexp|sql)$", regex_constants::icase);
+                if (!regex_match(file_path, validPathRegex)) {
+                    throw InvalidFileImportException("Invalid file path for importing database. Please provide a valid path with .\033[1mdbexp\033[0m or .\033[1msql\033[0m extension.");
+                }
+                if (file_path.substr(file_path.size() - 6) == ".dbexp") {
+                    format = make_shared<CustomFormat>();
+                } else if (file_path.substr(file_path.size() - 4) == ".sql") {
+                    format = make_shared<SQLFormat>();
+                }
+
+                ifstream file(file_path);
+                if (!file.is_open()) {
+                    throw FileNotOpenedException(file_path);
+                }
+                string firstLine;
+                getline(file, firstLine);
+                file.close();
+                Database database(format->parseDatabaseName(firstLine));
+                database.importDatabase(*format, file_path);
+                cout << green << "Database imported successfully from " << resetColor << "\"" << file_path << "\"" << endl << endl;
+                mainMenu(database);
+            } catch (const InvalidFileImportException &e) {
+                cout << e.what() << endl;
             }
             break;
         } else if (choice == "0") {
@@ -239,9 +260,11 @@ vector<pair<string, int>> Menu::readSQLQuery() {
 }
 
 shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme MissingSemicolonException
-    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE(?:\s+([^(\s]*)\s*(\([^)]*\)?)?)?\s*$)", regex_constants::icase);
+    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE(?:\s+([^(\s]*)\s*(\([^)]*\)?)?)?\s*$)",
+                                     regex_constants::icase);
     regex drop_table_regex(R"(^\s*DROP\s+TABLE(?:\s+(\S+))?\s*$)", regex_constants::icase);
-    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(\(?([^)]+)\)?)?\s*VALUES\s*(\(?\s*([^)]*)\)?)?\s*$)",regex_constants::icase);
+    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(\(?([^)]+)\)?)?\s*VALUES\s*(\(?\s*([^)]*)\)?)?\s*$)",
+                            regex_constants::icase);
 
     regex select_regex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?\s*$)", regex_constants::icase);
     regex update_regex("^UPDATE.*SET.*", regex_constants::icase);
@@ -250,7 +273,8 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
     regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
 
 
-    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",regex_constants::icase); // ovde sam ti uradio select
+    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",
+                                 regex_constants::icase); // ovde sam ti uradio select
     regex invalidArgumentsFrom("\\s*FROM(?:\\s*| WHERE.*)", regex_constants::icase);
 
     if (regex_match(query, create_table_basic_pattern)) {
