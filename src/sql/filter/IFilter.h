@@ -13,7 +13,10 @@ class IFilter {
 
 public:
     virtual ~IFilter() = default;
+
     virtual bool applyFilter(const Row &row) const = 0;
+
+    virtual string toString() const = 0;
 };
 
 

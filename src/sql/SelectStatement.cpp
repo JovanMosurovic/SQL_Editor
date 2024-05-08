@@ -5,7 +5,7 @@ SelectStatement::SelectStatement(const string &query) : Statement(query) {}
 
 bool SelectStatement::parse() {
     // errors();
-  //  regex selectRegex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)\s*(\S*)\s*$)", regex_constants::icase);
+    //  regex selectRegex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)\s*(\S*)\s*$)", regex_constants::icase);
     regex selectRegex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?\s*(?:WHERE\s+(.+))?\s*$)", regex_constants::icase);
     smatch matches;
     if (!regex_search(query, matches, selectRegex) || matches.size() < 4) {
@@ -42,54 +42,52 @@ bool SelectStatement::parse() {
         }
     }
 
-    regex whereRegex(R"(WHERE\s+(.*?)\s*(=|!=)\s*(\".*?\"|.*?)(?:\s*(AND|OR))?)", regex_constants::icase);
-    sregex_iterator whereIt(query.begin(), query.end(), whereRegex);
+    cout << "Where Clause: " << matches[4] << "\n";
+
+    if (matches.size() == 5) {
+        parseWhereClause(matches[4]);
+    }
+
+
+    return true;
+}
+
+void SelectStatement::parseWhereClause(const string &whereClause) {
+    regex whereRegex(R"(\s*(\w+)\s*(=|!=|<>|<|>)\s*(\"[^"]*\"|'[^']*'|\w+)(?:\s*(AND|OR))?)", regex_constants::icase);
+    sregex_iterator whereIt(whereClause.begin(), whereClause.end(), whereRegex);
     sregex_iterator whereEnd;
-    shared_ptr<IFilter> lastFilter;
-    string lastOperator;
+
     while (whereIt != whereEnd) {
         smatch match = *whereIt;
         string columnName = match.str(1);
         string operatorSymbol = match.str(2);
         string value = match.str(3);
-        string logicalOperator = match.str(4);
 
-        if (value.front() == '\"' && value.back() == '\"') {
+        // Remove quotes if they exist
+        if ((value.front() == '\"' && value.back() == '\"') || (value.front() == '\'' && value.back() == '\'')) {
             value = value.substr(1, value.size() - 2);
         }
 
-        shared_ptr<IFilter> filter;
+        // Create appropriate filter
+        shared_ptr<IFilter> currentFilter;
         if (operatorSymbol == "=") {
-            filter = make_shared<EqualityFilter>(columnName, value);
-        } else if (operatorSymbol == "!=") {
-            filter = make_shared<InequalityFilter>(columnName, value);
-        }
-
-        if (lastFilter) {
-            if (lastOperator == "AND") {
-                filter = make_shared<AndFilter>(lastFilter, filter);
-            } else if (lastOperator == "OR") {
-                filter = make_shared<OrFilter>(lastFilter, filter);
-            }
-        }
-
-        if(logicalOperator.empty() || logicalOperator == "AND") {
-            filters.push_back(filter);
-            lastFilter = nullptr;
+            currentFilter = make_shared<EqualityFilter>(columnName, value);
+        } else if (operatorSymbol == "!=" || operatorSymbol == "<>") {
+            currentFilter = make_shared<InequalityFilter>(columnName, value);
         } else {
-            lastFilter = filter;
+            currentFilter = nullptr;  // Handle other operators if needed
         }
 
-        lastOperator = logicalOperator;
+        // Add the filter to the filters list
+        if (currentFilter) {
+            filters.push_back(currentFilter);
+        }
+
         whereIt++;
     }
-
-    if (lastFilter) {
-        filters.push_back(lastFilter);
-    }
-
-    return true;
 }
+
+
 
 
 void SelectStatement::execute(Database &db) {
@@ -122,7 +120,7 @@ void SelectStatement::execute(Database &db) {
     cout << endl;
     cout << "Filters: ";
     for (const auto &filter : filters) {
-        cout << filter << " ";
+        cout << filter->toString() << " : next filter : ";
     }
     cout << endl;
 

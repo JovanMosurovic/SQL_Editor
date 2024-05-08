@@ -9,10 +9,11 @@ class InequalityFilter : public IFilter {
     string value;
 
 public:
-    InequalityFilter(std::string columnName, std::string value)
-            : columnName(std::move(columnName)), value(std::move(value)) {}
+    InequalityFilter(std::string columnName, std::string value);
 
     bool applyFilter(const Row& row) const override;
+
+    string toString() const override;
 
 };
 

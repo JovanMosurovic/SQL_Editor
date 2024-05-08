@@ -12,6 +12,8 @@ public:
     OrFilter(shared_ptr<IFilter> filter1, shared_ptr<IFilter> filter2);
 
     bool applyFilter(const Row& row) const override;
+
+    string toString() const override;
 };
 
 

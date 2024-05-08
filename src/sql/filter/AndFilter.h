@@ -13,6 +13,8 @@ public:
 
     bool applyFilter(const Row& row) const override;
 
+    string toString() const override;
+
 };
 
 

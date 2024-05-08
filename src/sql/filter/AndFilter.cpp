@@ -7,3 +7,7 @@ AndFilter::AndFilter(shared_ptr<IFilter> filter1, shared_ptr<IFilter> filter2)
 bool AndFilter::applyFilter(const Row &row) const {
     return filter1->applyFilter(row) && filter2->applyFilter(row);
 }
+
+string AndFilter::toString() const {
+    return "(" + filter1->toString() + " AND " + filter2->toString() + ")";
+}
