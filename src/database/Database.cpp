@@ -23,35 +23,30 @@ void Database::createTable(const string &tableName, const vector<Column> &column
 }
 
 void Database::dropTable(const string &tableName) {
-    auto it = tables.find(tableName);
-    if (it == tables.end()) {
-        throw TableDoesNotExistException(tableName);
-    }
-    tables.erase(it);
+//    auto it = tables.find(tableName);
+//    if (it == tables.end()) {
+//        throw TableDoesNotExistException(tableName);
+//    }
+//    tables.erase(it);
+      tables.erase(tableName);
 }
 
 void Database::addRowToTable(const string &tableName, const vector<string> &rowData) {
-    auto it = tables.find(tableName);
-    if (it == tables.end()) {
-        throw TableDoesNotExistException(tableName);
+    Table &table = getTable(tableName);
+    if(rowData.size() != table.getColumns().size()) {
+        throw InvalidDataForAddRowException(rowData.size(), table.getColumns().size());
     }
-    if (rowData.size() != it->second.getColumns().size()) {
-        throw InvalidDataForAddRowException(rowData.size(), it->second.getColumns().size());
-    }
-    it->second.addRow(rowData);
+    table.addRow(rowData);
 }
 
 void Database::insertIntoTable(const string &tableName, const vector<string> &columnNames, const vector<string> &rowData) {
-    auto it = tables.find(tableName);
-    if (it == tables.end()) {
-        throw TableDoesNotExistException(tableName);
-    }
-    if (columnNames.size() != rowData.size()) {
+    Table &table = getTable(tableName);
+    if(columnNames.size() != rowData.size()) {
         throw InvalidDataForAddRowException(rowData.size(), columnNames.size());
     }
 
     vector<string> actualColumnOrder;
-    for (const auto &column : it->second.getColumns()) {
+    for (const auto &column : table.getColumns()) {
         actualColumnOrder.push_back(column.getName());
     }
 
@@ -65,48 +60,62 @@ void Database::insertIntoTable(const string &tableName, const vector<string> &co
             throw ColumnDoesNotExistException(columnNames[i]);
         }
     }
-    it->second.addRow(reorderedData);
+    table.addRow(reorderedData);
 }
 
 void Database::updateRowInTable(const string &tableName, const long long rowIndex, const vector<string> &rowData) {
-    auto it = tables.find(tableName);
-    if(it == tables.end()) {
-        throw TableDoesNotExistException(tableName);
+    Table &table = getTable(tableName);
+    if(rowIndex >= table.getRows().size()) {
+        throw RowOutOfBoundsException(rowIndex, table.getRows().size());
     }
-    if(rowIndex >= it->second.getRows().size()) {
-        throw RowOutOfBoundsException(rowIndex, it->second.getRows().size());
+    if(rowData.size() != table.getColumns().size()) {
+        throw InvalidDataForUpdateException(rowData.size(), table.getColumns().size());
     }
-    if(rowData.size() != it->second.getColumns().size()) {
-        throw InvalidDataForUpdateException(rowData.size(), it->second.getColumns().size());
-    }
-    it->second.updateRow(rowIndex, rowData);
+    table.updateRow(rowIndex, rowData);
 }
 
 void Database::removeRowFromTable(const string &tableName, const long long rowIndex) {
-    auto it = tables.find(tableName);
-    if (it == tables.end()) {
-        throw TableDoesNotExistException(tableName);
+    Table &table = getTable(tableName);
+    if(rowIndex >= table.getRows().size()) {
+        throw RowOutOfBoundsException(rowIndex, table.getRows().size());
     }
-    if (rowIndex > it->second.getRows().size()) {
-        throw RowOutOfBoundsException(rowIndex, it->second.getRows().size());
-    }
-    it->second.removeRow(rowIndex);
+    table.removeRow(rowIndex);
 }
 
 void Database::clearTable(const string &tableName) {
-    auto it = tables.find(tableName);
-    if (it == tables.end()) {
-        throw TableDoesNotExistException(tableName);
-    }
-    it->second.clearRows();
+    Table &table = getTable(tableName);
+    table.clearRows();
 }
 
-void Database::selectFromTable(const string &tableName, const string &tableAlias, const vector<string> &columnNames) {
-    auto it = tables.find(tableName);
-    if (it == tables.end()) {
-        throw TableDoesNotExistException(tableName);
-    }
-    Table &table = it->second;
+void Database::selectFromTable(const string &tableName, const string &tableAlias, const vector<string> &columnNames, const vector<shared_ptr<IFilter>>& filters) {
+    //<editor-fold desc="previous implementation">
+//    Table &table = getTable(tableName);
+//
+//    for(const auto &columnName : columnNames) {
+//        if(!table.hasColumn(columnName)) {
+//            throw ColumnDoesNotExistException(columnName);
+//        }
+//    }
+//
+//    vector<Column> selectedColumns;
+//    for(const auto &columnName : columnNames) {
+//        int columnIndex = table.getColumnIndex(columnName);
+//        selectedColumns.push_back(table.getColumns()[columnIndex]);
+//    }
+//    Table selectedTable(tableAlias, selectedColumns);
+//
+//    for (const auto &row : table.getRows()) {
+//        vector<string> selectedRow;
+//        selectedRow.reserve(columnNames.size());
+//        for (const auto &columnName : columnNames) {
+//            selectedRow.push_back(row.getData()[table.getColumnIndex(columnName)]);
+//        }
+//        selectedTable.addRow(selectedRow);
+//    }
+//
+//    selectedTable.printTable();
+    //</editor-fold>
+    Table &table = getTable(tableName);
 
     for(const auto &columnName : columnNames) {
         if(!table.hasColumn(columnName)) {
@@ -122,15 +131,29 @@ void Database::selectFromTable(const string &tableName, const string &tableAlias
     Table selectedTable(tableAlias, selectedColumns);
 
     for (const auto &row : table.getRows()) {
-        vector<string> selectedRow;
-        selectedRow.reserve(columnNames.size());
-        for (const auto &columnName : columnNames) {
-            selectedRow.push_back(row.getData()[table.getColumnIndex(columnName)]);
+        bool shouldAddRow = true;
+        for (const auto &filter : filters) {
+            if (filter && !filter->applyFilter(row)) {
+                shouldAddRow = false;
+                break;
+            }
         }
-        selectedTable.addRow(selectedRow);
+        if (shouldAddRow) {
+            vector<string> selectedRow;
+            selectedRow.reserve(columnNames.size());
+            for (const auto &columnName : columnNames) {
+                selectedRow.push_back(row.getData()[table.getColumnIndex(columnName)]);
+            }
+            selectedTable.addRow(selectedRow);
+        }
     }
 
-    selectedTable.printTable();
+    if (selectedTable.getRows().empty()) {
+        cout << "\xC4> Query did not return any results." << endl;
+    } else {
+        selectedTable.printTable();
+    }
+
 }
 
 void Database::importDatabase(const Format& format, const string& filePath) {
@@ -142,7 +165,7 @@ void Database::importDatabase(const Format& format, const string& filePath) {
     string line;
     unique_ptr<Table> currentTable = nullptr;
     bool isTableInitialized = false;
-    bool isSQLFormat = filePath.substr(filePath.find_last_of(".") + 1) == "sql";
+    bool isSQLFormat = filePath.substr(filePath.find_last_of('.') + 1) == "sql";
     bool expectingColumnHeaders = false;  // Only used for custom format
 
     auto trim = [](string& s) {
@@ -166,7 +189,7 @@ void Database::importDatabase(const Format& format, const string& filePath) {
                 vector<string> rowData = format.parseRow(line);
                 currentTable->addRow(rowData);
             }
-        } else {  // Handling custom format
+        } else {  // Custom format
             if (line.substr(0, 6) == "Table:") {
                 if (currentTable) {
                     tables.emplace(currentTable->getName(), std::move(*currentTable));
@@ -176,11 +199,11 @@ void Database::importDatabase(const Format& format, const string& filePath) {
                 currentTable = make_unique<Table>(tableName, vector<Column>());
                 expectingColumnHeaders = true;
             } else if (expectingColumnHeaders) {
-                vector<string> columnNames = format.parseRow(line);  // Parses column names
+                vector<string> columnNames = format.parseRow(line);
                 vector<Column> columns;
                 columns.reserve(columnNames.size());
                 for (const auto& columnName : columnNames) {
-                    columns.emplace_back(columnName);  // Assuming Column constructor takes a columnName
+                    columns.emplace_back(columnName);
                 }
                 currentTable = make_unique<Table>(currentTable->getName(), columns);
                 expectingColumnHeaders = false;
@@ -198,7 +221,6 @@ void Database::importDatabase(const Format& format, const string& filePath) {
 
     file.close();
 }
-
 
 void Database::exportDatabase(const Format& format, const string& filePath) {
     ofstream file(filePath);

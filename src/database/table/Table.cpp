@@ -11,7 +11,6 @@ Table::Table(const string &name, const vector<Column> &columns) {
 
 Table::Table(Table&& other) noexcept
         : name(std::move(other.name)), columns(std::move(other.columns)), rows(std::move(other.rows)) {
-    // After moving, the other object's vectors are empty, and its strings are empty.
 }
 
 Table::Table(const Table &other) : name(other.name), columns(other.columns), rows(other.rows) {

@@ -260,22 +260,19 @@ vector<pair<string, int>> Menu::readSQLQuery() {
 }
 
 shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme MissingSemicolonException
-    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE(?:\s+([^(\s]*)\s*(\([^)]*\)?)?)?\s*$)",
-                                     regex_constants::icase);
+    regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE(?:\s+([^(\s]*)\s*(\([^)]*\)?)?)?\s*$)",regex_constants::icase);
     regex drop_table_regex(R"(^\s*DROP\s+TABLE(?:\s+(\S+))?\s*$)", regex_constants::icase);
-    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(\(?([^)]+)\)?)?\s*VALUES\s*(\(?\s*([^)]*)\)?)?\s*$)",
-                            regex_constants::icase);
+    regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(\(?([^)]+)\)?)?\s*VALUES\s*(\(?\s*([^)]*)\)?)?\s*$)",regex_constants::icase);
 
-    regex select_regex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?\s*$)", regex_constants::icase);
+    regex select_regex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?\s*(?:WHERE\s+(.+))?\s*$)", regex_constants::icase);
+    //^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)\s*(\S*)\s*$
     regex update_regex("^UPDATE.*SET.*", regex_constants::icase);
     regex delete_regex("^DELETE FROM.*", regex_constants::icase);
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
     regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
 
 
-    regex invalidArgumentsSelect(R"(SELECT\s+FROM\s+([a-zA-Z]+)\s*)",
-                                 regex_constants::icase); // ovde sam ti uradio select
-    regex invalidArgumentsFrom("\\s*FROM(?:\\s*| WHERE.*)", regex_constants::icase);
+
 
     if (regex_match(query, create_table_basic_pattern)) {
         return make_shared<CreateTableStatement>(query);
@@ -293,10 +290,6 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
         return make_shared<ShowTablesStatement>(query);
     } else if (regex_match(query, join_regex)) {
         return make_shared<InnerJoinStatement>(query);
-    } else if (regex_search(query, invalidArgumentsSelect)) {
-        throw InvalidArgumentsException("Invalid SELECT Arguments");
-    } else if (regex_search(query, invalidArgumentsFrom)) {
-        throw InvalidArgumentsException("Invalid FROM Arguments");
     } else if (regex_match(query, SyntaxRegexPatterns::MULTIPLE_KEYWORDS_REGEX)) {
         throw SyntaxException("Multiple keywords detected");
     } else {
@@ -324,7 +317,9 @@ void Menu::highlightKeywords(string &line) {
             {"UPDATE", cyan},
             {"SET",    cyan},
             {"SHOW",   magenta},
-            {"TABLES", magenta}
+            {"TABLES", magenta},
+            {"AND", green},
+            {"OR",     green}
     };
 
     for (const auto &[keyword, color]: keywords) {

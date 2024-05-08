@@ -8,6 +8,8 @@
 #include "../exceptions/DatabaseExceptions.h"
 #include "../export/CustomFormat.h"
 #include "../export/SQLFormat.h"
+#include "../sql/filter/EqualityFilter.h"
+#include "../sql/filter/InequalityFilter.h"
 
 class Database {
     string name;
@@ -32,7 +34,7 @@ public:
 
     void clearTable(const string& tableName);
 
-    void selectFromTable(const string& tableName, const string& tableAlias, const vector<string>& columnNames);
+    void selectFromTable(const string& tableName, const string& tableAlias, const vector<string>& columnNames, const vector<shared_ptr<IFilter>>& filters);
 
     void importDatabase(const Format& format, const string& filePath);
     void exportDatabase(const Format& format, const string& filePath);
