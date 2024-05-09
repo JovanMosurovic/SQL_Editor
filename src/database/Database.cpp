@@ -11,7 +11,7 @@ void Database::addTable(const Table &table) {
 }
 
 void Database::createTable(const string &tableName, const vector<Column> &columns) {
-    regex tableName_pattern("^[A-Za-z]+$");
+    regex tableName_pattern("^[A-Za-z_]+$");
     if (!(regex_match(tableName, tableName_pattern))) {
         throw InvalidTableNameException(tableName);
     }
