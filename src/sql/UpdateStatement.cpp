@@ -4,6 +4,7 @@
 UpdateStatement::UpdateStatement(const string &query) : Statement(query) {}
 
 bool UpdateStatement::parse() {
+    errors();
     regex update_regex(R"(^\s*UPDATE\s+(\S+)\s+SET\s+(.+?)(?:\s+WHERE\s+(.+))?\s*$)", regex_constants::icase);
     smatch matches;
 
@@ -99,7 +100,7 @@ void UpdateStatement::execute(Database &db) {
 }
 
 void UpdateStatement::errors() {
-    regex update_regex(R"(^\s*UPDATE\s+(\S+)(?:\s+SET\s*(.*))?(?:\s+WHERE\s*(.*))?\s*$)", regex_constants::icase);
+    regex update_regex(R"(^\s*UPDATE\s+(\S+)(?:\s+SET\s*(.*?))?(?:\s+WHERE\s*(.*))?\s*$)", regex_constants::icase);
     smatch matches;
 
     if (!regex_match(query, matches, update_regex)) {
@@ -110,11 +111,57 @@ void UpdateStatement::errors() {
         throw MissingArgumentsException("UPDATE is missing table name.");
     }
 
-    if (matches[2].matched && matches[2].str().empty()) {
-        throw MissingArgumentsException("SET clause requires changes. None provided.");
+    if (!matches[2].matched) {
+        throw IncompleteInputException("UPDATE statement is missing SET clause.");
+    }
+
+    regex set_clause_input_regex(R"(^\s*.*WHERE.*\s*$)", regex_constants::icase);
+    if (matches[2].matched && regex_match(matches[2].str(), set_clause_input_regex)) {
+        throw IncompleteInputException("Incomplete input after SET clause.");
+    }
+
+    if (matches[2].matched && !regex_match(matches[2].str(), SyntaxRegexPatterns::VALID_QUOTE_REGEX)) {
+        throw SyntaxException("Mismatched or mixed quotes in SET clause.");
     }
 
     if (matches[3].matched && matches[3].str().empty()) {
         throw MissingArgumentsException("WHERE clause requires conditions. None provided.");
+    }
+
+    string table_name_for_errors = matches[1].str();
+    if (!regex_match(table_name_for_errors, SyntaxRegexPatterns::VALID_QUOTE_REGEX)) {
+        throw SyntaxException("Mismatched or mixed quotes in table name.");
+    }
+
+    if (matches[2].matched) {
+        string set_clause = matches[2].str();
+        if (!regex_match(set_clause, SyntaxRegexPatterns::VALID_QUOTE_REGEX)) {
+            throw SyntaxException("Mismatched or mixed quotes in SET clause.");
+        }
+
+        regex assignment_regex(R"(\s*(\w+)\s*=\s*(\"[^"]*\"|'[^']*'|\w+)(?:\s*,)?)", regex_constants::icase);
+        sregex_iterator assignment_it(set_clause.begin(), set_clause.end(), assignment_regex);
+        sregex_iterator assignment_end;
+
+        while (assignment_it != assignment_end) {
+            smatch match = *assignment_it;
+            string value = match.str(2);
+            if (value.front() != '\"' || value.back() != '\"') {
+                throw SyntaxException("Values in SET clause must be surrounded by quotes.");
+            }
+
+            assignment_it++;
+        }
+    }
+
+    string set_clause_error = matches[2].str();
+    regex set_clause_syntax_check(R"(^\s*(\S+)\s*=\s*('[^']*'|"[^"]*")\s*$)", regex_constants::icase);
+    if (!regex_match(set_clause_error, set_clause_syntax_check)) {
+        throw SyntaxException("Invalid syntax in SET clause.");
+    }
+
+    if (matches[3].matched) {
+        string where_clause = matches[3].str();
+        SyntaxRegexPatterns::checkWhereClauseErrors(where_clause);
     }
 }

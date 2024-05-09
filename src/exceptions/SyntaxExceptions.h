@@ -62,4 +62,16 @@ public:
         return message.c_str();
     }
 };
+
+class IncompleteInputException : public exception {
+    string message;
+
+public:
+    IncompleteInputException(const string& details)
+            : message("\033[1;31m[SYNTAX ERROR]\033[0m \033[1mIncomplete input:\033[0m " + details) {}
+
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+};
 #endif //ELEMENTAL_SQL_IMPLEMENTATION_SYNTAXEXCEPTIONS_H
