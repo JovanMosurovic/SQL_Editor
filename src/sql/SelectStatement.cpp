@@ -1,7 +1,8 @@
 
 #include "SelectStatement.h"
 
-SelectStatement::SelectStatement(const string &query) : Statement(query) {}
+SelectStatement::SelectStatement(const string &query) : Statement(query), join_table_name(""), join_table_alias(""),
+                                                          join_column(""), join_column2("") {}
 
 bool SelectStatement::parse() {
     // errors();
@@ -123,7 +124,7 @@ void SelectStatement::execute(Database &db) {
         shared_ptr<Table> joinedTable = db.innerJoinTables(table_name, join_table_name, join_column, join_column2);
         db.addTable(*joinedTable);
         db.selectFromTable(joinedTable->getName(), table_alias, selectedColumns, filters);
-        //db.dropTable(joinedTable->getName());
+        db.dropTable(joinedTable->getName());
     } else {
         db.selectFromTable(table_name, table_alias, selectedColumns, filters);
     }
