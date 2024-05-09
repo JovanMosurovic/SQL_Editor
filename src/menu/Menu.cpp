@@ -268,7 +268,6 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
     regex update_regex("^UPDATE.*SET.*", regex_constants::icase);
     regex delete_regex("^DELETE FROM.*", regex_constants::icase);
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
-    regex join_regex("^SELECT.*FROM.*INNER JOIN.*ON.*", regex_constants::icase);
 
     if (regex_match(query, create_table_basic_pattern)) {
         return make_shared<CreateTableStatement>(query);
@@ -284,8 +283,6 @@ shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme Missing
         return make_shared<DeleteFromStatement>(query);
     } else if (regex_match(query, show_tables_regex)) {
         return make_shared<ShowTablesStatement>(query);
-    } else if (regex_match(query, join_regex)) {
-        return make_shared<InnerJoinStatement>(query);
     } else if (regex_match(query, SyntaxRegexPatterns::MULTIPLE_KEYWORDS_REGEX)) {
         throw SyntaxException("Multiple keywords detected");
     } else {

@@ -13,7 +13,6 @@ add_executable(Elemental_SQL_Implementation src/main.cpp
         src/sql/SelectStatement.cpp
         src/sql/CreateTableStatement.cpp
         src/sql/DropTableStatement.cpp
-        src/sql/InnerJoinStatement.cpp
         src/sql/InsertIntoStatement.cpp
         src/sql/UpdateStatement.cpp
         src/sql/DeleteFromStatement.cpp

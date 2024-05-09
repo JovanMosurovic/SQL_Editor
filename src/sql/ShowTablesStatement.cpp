@@ -14,4 +14,8 @@ bool ShowTablesStatement::parse() {
 }
 
 void ShowTablesStatement::errors() {
+    regex show_tables_regex(R"(^\s*SHOW\s+TABLES\s*$)", regex_constants::icase);
+    if (!regex_match(query, show_tables_regex)) {
+        throw SyntaxException("Invalid syntax for SHOW TABLES statement.");
+    }
 }

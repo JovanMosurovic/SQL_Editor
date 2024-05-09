@@ -14,7 +14,6 @@
 #include "../sql/CreateTableStatement.h"
 #include "../sql/DropTableStatement.h"
 #include "../sql/SelectStatement.h"
-#include "../sql/InnerJoinStatement.h"
 #include "../sql/InsertIntoStatement.h"
 #include "../sql/UpdateStatement.h"
 #include "../sql/DeleteFromStatement.h"
