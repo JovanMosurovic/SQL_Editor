@@ -47,8 +47,12 @@ bool SelectStatement::parse() {
     if (innerJoin) {
         join_table_name = matches[4];
         join_table_alias = matches[5];
-        join_column = matches[6];
-        join_column2 = matches[7];
+        join_column = matches[6].str().substr(matches[6].str().find('.') + 1);
+        join_column2 = matches[7].str().substr(matches[7].str().find('.') + 1);
+        cout << "Join table name: " << join_table_name << endl;
+        cout << "Join table alias: " << join_table_alias << endl;
+        cout << "Join column: " << join_column << endl;
+        cout << "Join column2: " << join_column2 << endl;
     }
 
     if (matches.size() == 9) {
@@ -116,9 +120,10 @@ void SelectStatement::execute(Database &db) {
 
     if (!join_table_name.empty()) {
         // Entering JOIN
-        shared_ptr<Table> fullMergedTable = Table::mergeTwoTables(db.getTable(table_name),
-                                                                  db.getTable(join_table_name));
-        fullMergedTable->printTable();
+        shared_ptr<Table> joinedTable = db.innerJoinTables(table_name, join_table_name, join_column, join_column2);
+        db.addTable(*joinedTable);
+        db.selectFromTable(joinedTable->getName(), table_alias, selectedColumns, filters);
+        //db.dropTable(joinedTable->getName());
     } else {
         db.selectFromTable(table_name, table_alias, selectedColumns, filters);
     }
