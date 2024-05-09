@@ -93,8 +93,14 @@ void DeleteFromStatement::errors() {
         throw MissingArgumentsException("DELETE FROM is missing table name.");
     }
 
-    if (matches[2].matched && matches[2].str().empty()) {
-        throw MissingArgumentsException("WHERE clause requires conditions. None provided.");
+    string table_name_for_errors = matches[1].str();
+    if (!regex_match(table_name_for_errors, SyntaxRegexPatterns::VALID_QUOTE_REGEX)) {
+        throw SyntaxException("Mismatched or mixed quotes in table name.");
+    }
+
+    if (matches[2].matched) {
+        string where_clause = matches[2].str();
+        SyntaxRegexPatterns::checkWhereClauseErrors(where_clause);
     }
 }
 
