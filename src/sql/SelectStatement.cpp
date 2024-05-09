@@ -129,16 +129,7 @@ void SelectStatement::execute(Database &db) {
     }
 }
 
-
-
-
 void SelectStatement::errors() {
-    if (regex_match(query, regex(R"(^\s*SELECT(?:\s+FROM.*|\s*))", regex_constants::icase))) {
-        throw MissingArgumentsException("SELECT has no arguments.");
-    } else if (!regex_match(query, regex(".*\\s+FROM\\s*.*", regex_constants::icase))) {
-        throw MissingArgumentsException("No FROM keyword specified.");
-    } else if (!regex_search(query, regex(R"(.*\s+FROM\s+\w+\s*)", regex_constants::icase))) {
-        throw MissingArgumentsException("FROM has no arguments.");
-    }
+
 
 }
