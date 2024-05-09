@@ -259,11 +259,12 @@ vector<pair<string, int>> Menu::readSQLQuery() {
     return queries;
 }
 
-shared_ptr<Statement> Menu::parseSQLQuery(const string &query) { //fixme MissingSemicolonException
+shared_ptr<Statement> Menu::parseSQLQuery(const string &query) {
     regex create_table_basic_pattern(R"(^\s*CREATE\s+TABLE(?:\s+([^(\s]*)\s*(\([^)]*\)?)?)?\s*$)",regex_constants::icase);
     regex drop_table_regex(R"(^\s*DROP\s+TABLE(?:\s+(\S+))?\s*$)", regex_constants::icase);
     regex insert_into_regex(R"(^\s*INSERT\s+INTO\s+(\S+)?\s*(\(?([^)]+)\)?)?\s*VALUES\s*(\(?\s*([^)]*)\)?)?\s*$)",regex_constants::icase);
-    regex select_regex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?\s*(?:WHERE\s+(.+))?\s*$)", regex_constants::icase);
+    // regex select_regex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?\s*(?:WHERE\s+(.+))?\s*$)", regex_constants::icase);
+     regex select_regex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?(?:\s+INNER JOIN\s+(\S+)\s+(\S+)\s+ON\s+(\S+\.\S+)\s*=\s*(\S+\.\S+))?\s*(?:WHERE\s+(.+))?\s*;?\s*$)", regex_constants::icase);
     regex update_regex(R"(^\s*UPDATE\s+(\S+)?\s*(?:SET\s+(.*?))?(?:\s+WHERE\s+(.*))?\s*$)", regex_constants::icase);
     regex delete_regex("^DELETE FROM.*", regex_constants::icase);
     regex show_tables_regex("^SHOW TABLES", regex_constants::icase);
