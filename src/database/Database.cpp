@@ -23,12 +23,11 @@ void Database::createTable(const string &tableName, const vector<Column> &column
 }
 
 void Database::dropTable(const string &tableName) {
-//    auto it = tables.find(tableName);
-//    if (it == tables.end()) {
-//        throw TableDoesNotExistException(tableName);
-//    }
-//    tables.erase(it);
-      tables.erase(tableName);
+    auto it = tables.find(tableName);
+    if (it == tables.end()) {
+        throw TableDoesNotExistException(tableName);
+    }
+    tables.erase(it);
 }
 
 void Database::addRowToTable(const string &tableName, const vector<string> &rowData) {
