@@ -35,6 +35,8 @@ public:
 
     void updateRow(long long rowIndex, const vector<string>& newData);
 
+    static shared_ptr<Table> mergeTwoTables(const Table& t1, const Table& t2);
+
     bool hasColumn(const string& columnName) const;
 
     void printTable() const;
@@ -50,6 +52,8 @@ public:
 
     const vector<Row> &getRows() const;
     vector<Row> &getRows();
+
+    shared_ptr<Table> getTableAsColumn(const string &columnName) const;
 
     //</editor-fold>
 

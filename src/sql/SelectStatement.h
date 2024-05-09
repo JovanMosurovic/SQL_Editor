@@ -12,6 +12,10 @@ using namespace std;
 class SelectStatement : public Statement {
     string table_name;
     string table_alias;
+    string join_table_name = "";
+    string join_table_alias = "";
+    string join_column = "";
+    string join_column2 = "";
     vector<string> column_names;
     vector<shared_ptr<IFilter>> filters;
 

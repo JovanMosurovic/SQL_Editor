@@ -5,11 +5,14 @@ SelectStatement::SelectStatement(const string &query) : Statement(query) {}
 
 bool SelectStatement::parse() {
     // errors();
-    regex selectRegex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?\s*(?:WHERE\s+(.+))?\s*$)", regex_constants::icase);
+    regex selectRegex(
+            R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?(?:\s+(?:INNER\s+)?JOIN\s+(\S+)\s+(\S+)\s+ON\s+(\S+\.\S+)\s*=\s*(\S+\.\S+))?\s*(?:WHERE\s+(.+))?\s*;?\s*$)",
+            regex_constants::icase);
     smatch matches;
     if (!regex_search(query, matches, selectRegex) || matches.size() < 4) {
         return false;
     }
+    bool innerJoin = matches[4].matched;
 
     table_name = matches[2];
     table_alias = matches[3].length() > 0 ? matches[3] : table_name;
@@ -41,8 +44,15 @@ bool SelectStatement::parse() {
         }
     }
 
-    if (matches.size() == 5) {
-        parseWhereClause(matches[4]);
+    if (innerJoin) {
+        join_table_name = matches[4];
+        join_table_alias = matches[5];
+        join_column = matches[6];
+        join_column2 = matches[7];
+    }
+
+    if (matches.size() == 9) {
+        parseWhereClause(matches[8]);
     }
 
     return true;
@@ -90,13 +100,13 @@ void SelectStatement::execute(Database &db) {
 
     vector<string> allColumns;
     if (find(column_names.begin(), column_names.end(), "*") != column_names.end()) {
-        for (const auto &column : db.getTable(table_name).getColumns()) {
+        for (const auto &column: db.getTable(table_name).getColumns()) {
             allColumns.push_back(column.getName());
         }
     }
 
     vector<string> selectedColumns;
-    for (const auto &columnName : column_names) {
+    for (const auto &columnName: column_names) {
         if (columnName == "*") {
             selectedColumns.insert(selectedColumns.end(), allColumns.begin(), allColumns.end());
         } else {
@@ -104,7 +114,14 @@ void SelectStatement::execute(Database &db) {
         }
     }
 
-    db.selectFromTable(table_name, table_alias, selectedColumns, filters);
+    if (!join_table_name.empty()) {
+        // Entering JOIN
+        shared_ptr<Table> fullMergedTable = Table::mergeTwoTables(db.getTable(table_name),
+                                                                  db.getTable(join_table_name));
+        fullMergedTable->printTable();
+    } else {
+        db.selectFromTable(table_name, table_alias, selectedColumns, filters);
+    }
 }
 
 
@@ -113,8 +130,7 @@ void SelectStatement::errors() {
         throw MissingArgumentsException("SELECT has no arguments.");
     } else if (!regex_match(query, regex(".*\\s+FROM\\s*.*", regex_constants::icase))) {
         throw MissingArgumentsException("No FROM keyword specified.");
-    }
-    else if (!regex_search(query, regex(R"(.*\s+FROM\s+\w+\s*)", regex_constants::icase))) {
+    } else if (!regex_search(query, regex(R"(.*\s+FROM\s+\w+\s*)", regex_constants::icase))) {
         throw MissingArgumentsException("FROM has no arguments.");
     }
 

@@ -52,6 +52,24 @@ void Table::updateRow(const long long rowIndex, const vector<string> &newData) {
     rows[rowIndex].setData(newData);
 }
 
+shared_ptr<Table> Table::mergeTwoTables(const Table &t1, const Table &t2) {
+    vector<Column> newColumns = t1.columns;
+    newColumns.insert(newColumns.end(), t2.columns.begin(), t2.columns.end());
+
+    shared_ptr<Table> tempTable = make_shared<Table>(t1.name, newColumns);
+    size_t numRows = min(t1.rows.size(), t2.rows.size());
+
+    for (size_t i = 0; i < numRows; ++i) {
+        vector<string> rowData = t1.rows[i].getData();
+        vector<string> otherRowData = t2.rows[i].getData();
+        rowData.insert(rowData.end(), otherRowData.begin(), otherRowData.end());
+
+        tempTable->addRow(rowData);
+    }
+
+    return tempTable;
+}
+
 bool Table::hasColumn(const string &columnName) const {
     return any_of(columns.begin(), columns.end(), [&columnName](const Column &column) {
         return column.getName() == columnName;
@@ -110,6 +128,17 @@ const vector<Row> &Table::getRows() const {
 
 vector<Row> &Table::getRows() {
     return rows;
+}
+
+shared_ptr<Table> Table::getTableAsColumn(const string &columnName) const {
+    int columnIndex = getColumnIndex(columnName);
+    vector<Column> newColumns;
+    newColumns.push_back(columns[columnIndex]);
+    shared_ptr<Table> tempTable = make_shared<Table>(name, newColumns);
+    for (const auto &row : rows) {
+        tempTable->addRow({row.getData()[columnIndex]});
+    }
+    return tempTable;
 }
 
 //</editor-fold>
