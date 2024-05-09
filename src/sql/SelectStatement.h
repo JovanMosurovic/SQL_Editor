@@ -17,6 +17,7 @@ class SelectStatement : public Statement {
     string join_column;
     string join_column2;
     vector<string> column_names;
+    map<string, string> aliasMap;
     vector<shared_ptr<IFilter>> filters;
 
 public:
