@@ -14,7 +14,7 @@ public:
     InvalidTableNameException(const string& tableName)
             : message("\033[1;31m[TABLE CREATION FAILED]\033[0m Cannot create table with invalid name format.\n"
                       "\033[1;31m\033[4mERROR\033[0m\033[1;31m: Table name \033[0m" + tableName + "\033[1;31m is not typed in the correct format.\033[0m\n"
-                      "\033[1;31m\033[4mFormat\033[0m\033[1;31m:\033[0m Only English letters are allowed without spaces or special characters.") {}
+                      "\033[1;31m\033[4mFormat\033[0m\033[1;31m:\033[0m Only English letters are allowed with underline character. No spaces or special characters are allowed.") {}
 
     const char* what() const noexcept override {
         return message.c_str();
