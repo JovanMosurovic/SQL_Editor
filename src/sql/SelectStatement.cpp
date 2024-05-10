@@ -4,7 +4,10 @@
 SelectStatement::SelectStatement(const string &query) : Statement(query), join_table_name(""), join_table_alias(""), join_column(""), join_column2("") {}
 
 bool SelectStatement::parse() {
-    regex selectRegex(R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?(?:\s+(?:INNER\s+)?JOIN\s+(\S+)\s+(\S+)\s+ON\s+(\S+\.\S+)\s*=\s*(\S+\.\S+))?\s*(?:WHERE\s+(.+))?\s*;?\s*$)",regex_constants::icase);
+    errors();
+    regex selectRegex(
+            R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)(?:\s+(\S+))?(?:\s+(?:INNER\s+)?JOIN\s+(\S+)\s+(\S+)\s+ON\s+(\S+\.\S+)\s*=\s*(\S+\.\S+))?\s*(?:WHERE\s+(.+))?\s*;?\s*$)",
+            regex_constants::icase);
     smatch matches;
     if (!regex_search(query, matches, selectRegex) || matches.size() < 4) {
         return false;
@@ -100,36 +103,58 @@ void SelectStatement::execute(Database &db) {
         return;
     }
 
-    try {
-        vector<string> selectedColumns;
-        if (find(column_names.begin(), column_names.end(), "*") != column_names.end()) {
-            // If SELECT * is used, fetch all columns from the main table.
-            for (const auto &column : db.getTable(table_name).getColumns()) {
-                selectedColumns.push_back(column.getName());
-            }
-        } else {
-            // Otherwise, use the specified columns.
-            selectedColumns = column_names;
+    vector<string> selectedColumns;
+    if (find(column_names.begin(), column_names.end(), "*") != column_names.end()) {
+        // If SELECT * is used, fetch all columns from the main table.
+        for (const auto &column: db.getTable(table_name).getColumns()) {
+            selectedColumns.push_back(column.getName());
         }
-
-        // Handle JOIN operation if specified.
-        if (!join_table_name.empty()) {
-            // Perform the inner join operation.
-            shared_ptr<Table> joinedTable = db.innerJoinTables(table_name, join_table_name, join_column, join_column2);
-            db.addTable(*joinedTable);  // Assuming method to add a table to the database.
-            db.selectFromTable(joinedTable->getName(), joinedTable->getName(), selectedColumns, filters);
-            db.dropTable(joinedTable->getName());
-        } else {
-            // Select directly from the main table if no join.
-            db.selectFromTable(table_name, table_name, selectedColumns, filters);
-        }
-
-    } catch (const std::exception &e) {
-        cout << "Execution error: " << e.what() << std::endl;
+    } else {
+        // Otherwise, use the specified columns.
+        selectedColumns = column_names;
     }
+
+    // Handle JOIN operation if specified.
+    if (!join_table_name.empty()) {
+        // Perform the inner join operation.
+        shared_ptr<Table> joinedTable = db.innerJoinTables(table_name, join_table_name, join_column, join_column2);
+        db.addTable(*joinedTable);  // Assuming method to add a table to the database.
+        db.selectFromTable(joinedTable->getName(), joinedTable->getName(), selectedColumns, filters);
+        db.dropTable(joinedTable->getName());
+    } else {
+        // Select directly from the main table if no join.
+        db.selectFromTable(table_name, table_name, selectedColumns, filters);
+    }
+
+
 }
 
 void SelectStatement::errors() {
+    regex select_regex(
+            R"(^\s*SELECT\s+(.*?)\s+FROM\s+(\S+)?(?:\s+(\S+))?(?:\s+(?:INNER\s+)?JOIN\s+(\S+)\s+(\S+)\s+ON\s+(\S+\.\S+)\s*=\s*(\S+\.\S+))?\s*(WHERE\s+(.+))?\s*;?\s*$)",
+            regex_constants::icase);
+    smatch matches;
 
+    if (!regex_search(query, matches, select_regex)) {
+        throw SyntaxException("Invalid syntax for SELECT statement.");
+    }
 
+    if (matches[1].str().empty()) {
+        throw MissingArgumentsException("SELECT statement is missing column names.");
+    }
+
+    if (!matches[2].matched) {
+        throw MissingArgumentsException("SELECT statement is missing table name.");
+    }
+
+    if (matches[4].matched && (!matches[5].matched || !matches[6].matched || !matches[7].matched)) {
+        throw SyntaxException("Incomplete JOIN clause. Ensure table name, alias and join conditions are specified correctly.");
+    }
+
+    if (matches[8].matched) {
+        SyntaxRegexPatterns::checkWhereClauseErrors(matches[9]);
+    } else if (matches[9].str().empty() && regex_search(query, regex(R"(WHERE)", regex_constants::icase))) {
+        throw MissingArgumentsException("WHERE clause is specified but no conditions are provided.");
+    }
 }
+
