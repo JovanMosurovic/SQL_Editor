@@ -82,3 +82,7 @@
 8	4771	7370031208116539	CMakeFiles/Elemental_SQL_Implementation.dir/src/menu/Menu.cpp.obj	c1cc08953da5359c
 3358	5695	7370031217372653	CMakeFiles/Elemental_SQL_Implementation.dir/src/utils/SyntaxRegexPatterns.cpp.obj	7187eb69589a7ae5
 5695	19737	7370031357668674	Elemental_SQL_Implementation.exe	cadaff4342a9f29a
+6	2556	7370034902239137	CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/SelectStatement.cpp.obj	c15d6d152075b34
+2556	16622	7370035042858803	Elemental_SQL_Implementation.exe	cadaff4342a9f29a
+4	2283	7370043758213857	CMakeFiles/Elemental_SQL_Implementation.dir/src/sql/DeleteFromStatement.cpp.obj	e3bf625cb11c54b
+2284	16269	7370043897971771	Elemental_SQL_Implementation.exe	cadaff4342a9f29a

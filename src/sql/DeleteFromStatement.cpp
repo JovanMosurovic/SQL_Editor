@@ -66,7 +66,7 @@ void DeleteFromStatement::parseWhereClause(const string &whereClause) {
         shared_ptr<IFilter> currentFilter;
         if (operatorSymbol == "=") {
             currentFilter = make_shared<EqualityFilter>(columnName, value);
-        } else if (operatorSymbol == "!=") {
+        } else if (operatorSymbol == "!=" || operatorSymbol == "<>") {
             currentFilter = make_shared<InequalityFilter>(columnName, value);
         } else {
             currentFilter = nullptr;  // Handle other operators if needed
