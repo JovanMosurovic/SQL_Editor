@@ -36,31 +36,7 @@ public:
 
     void selectFromTable(const string& tableName, const string& tableAlias, const vector<string>& columnNames, const vector<shared_ptr<IFilter>>& filters);
 
-    shared_ptr<Table> innerJoinTables(const string &table1Name, const string &table2Name, const string &column1, const string &column2) {
-        Table &table1 = getTable(table1Name);
-        Table &table2 = getTable(table2Name);
-
-//        if (!table1.hasColumn(column1) || !table2.hasColumn(column2)) {
-//            throw ColumnDoesNotExistException("Column does not exist in one of the tables.");
-//        }
-
-        vector<Column> newColumns = table1.getColumns();
-        newColumns.insert(newColumns.end(), table2.getColumns().begin(), table2.getColumns().end());
-
-        Table resultTable("Result", newColumns);
-
-        for (const auto &row1 : table1.getRows()) {
-            for (const auto &row2 : table2.getRows()) {
-                if (row1.getColumnValue(column1) == row2.getColumnValue(column2)) {
-                    vector<string> rowData = row1.getData();
-                    rowData.insert(rowData.end(), row2.getData().begin(), row2.getData().end());
-                    resultTable.addRow(rowData);
-                }
-            }
-        }
-
-        return make_shared<Table>(resultTable);
-    }
+    shared_ptr<Table> innerJoinTables(const string &table1Name, const string &table2Name, const string &column1, const string &column2);
 
     void importDatabase(const Format& format, const string& filePath);
     void exportDatabase(const Format& format, const string& filePath);
