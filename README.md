@@ -56,17 +56,49 @@ Upon execution, the program presents a menu with various options, as explained i
 
 
 ## SQL Command Format 
-All commands are case-insensitive. The wildcard character `*` can be used in any command to represent all possible values. Here are the formats for the SQL commands:
-- Creating a table: `create table <table_name> (<column1>, <column2>, ..., <columnN>);`
-- Inserting a record: `insert into <table_name> (<column1>, <column2>, ..., <columnN>) values (<value1>, <value2>, ..., <valueN>);`
-- Deleting records: `delete from <table_name> where <condition>;`
-- Updating records: `update <table_name> set <column> = <value> where <condition>;`
-- Displaying tables: `show tables;`
-- Deleting a table: `drop table <table_name>;`
-- Selecting all columns from a table: `select * from <table_name>;`
-- Selecting specific columns from a table: `select <column1>, <column2>, ..., <columnN> from <table_name> where <condition>;`
-- Selecting with inner join between two tables with aliases: `select <column1>, <column2>, ..., <columnN> from <table1> as <alias1> inner join <table2> as <alias2> on <alias1>.<column> = <alias2>.<column> where <condition>;`
-
+All commands are case-insensitive. The wildcard character * can be used in any `SELECT` query and contexts where a `SELECT` query is utilized, to represent all possible values. Here are the formats for the SQL commands:
+- Creating a table:
+  ```
+  create table <table_name> (<column1>, <column2>, ..., <columnN>);
+  ```
+- Inserting a record:
+  ```
+  insert into <table_name> (<column1>, <column2>, ..., <columnN>) values (<value1>, <value2>, ..., <valueN>);
+  ```
+- Deleting records:
+  ```
+  delete from <table_name> where <condition>;
+  ```
+- Updating records:
+  ```
+  update <table_name> set <column> = <value> where <condition>;
+  ```
+- Displaying tables:
+  ```
+  show tables;
+  ```
+- Deleting a table:
+  ```
+  drop table <table_name>;
+  ```
+- Selecting all columns from a table:
+  ```
+  select * from <table_name>;
+  ```
+- Selecting specific columns from a table:  
+  ```
+  select <column1>, <column2>, ..., <columnN>
+  from <table_name> <br>
+  where <condition>;
+  ```
+- Selecting with inner join between two tables with aliases:
+  ```
+  select <column1>, <column2>, ..., <columnN>
+  from <table1> as <alias1>
+  inner join <table2> as <alias2> on <alias1>.<column> = <alias2>.<column>
+  where <condition>;
+  ```
+  
 ## Notes
 
 In the SQL commands listed above, `<table_name>`, `<columnN>`, `<valueN>`, `<condition>`, and `<aliasN>` are placeholders. You should replace them with the actual table names, column names, values, conditions, and aliases that you use in your project. Here's what each placeholder represents:
