@@ -11,7 +11,6 @@ This project encapsulates a command-line Database Management System (DBMS) devel
 ## Table of Contents
 
 - [Features](#features)
-  - /
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Usage](#usage)
