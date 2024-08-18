@@ -61,19 +61,29 @@ vector<string> SQLFormat::parseRow(const string &line) const {
 
 
 Table SQLFormat::parseTable(const string &line) const {
-    regex tablePattern(R"(CREATE TABLE (\w+) \((.*)\);)");
+    regex tablePattern(R"(CREATE TABLE (\w+)\s*\((.*)\)\s*;?\s*$)");
     smatch matches;
     if (regex_match(line, matches, tablePattern)) {
         string tableName = matches[1];
         string columnsStr = matches[2];
-        stringstream ss(columnsStr);
-        string column;
+        istringstream ss(columnsStr);
         vector<Column> columns;
-        while (getline(ss, column, ',')) {
-            columns.emplace_back(column);
+
+        string columnDef;
+        while (getline(ss, columnDef, ',')) {
+            // Removing leading and trailing whitespaces
+            columnDef = regex_replace(columnDef, regex("^\\s+|\\s+$"), "");
+            
+            // Extracting column name (first part before space)
+            istringstream columnStream(columnDef);
+            string columnName;
+            columnStream >> columnName;
+
+            columns.emplace_back(columnName);
         }
+
         return {tableName, columns};
     } else {
-        throw InvalidFormatException("Invalid table format in SQL file.");
+        throw InvalidFormatException("Invalid table format in SQL file: " + line);
     }
 }
