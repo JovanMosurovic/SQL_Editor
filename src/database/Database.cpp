@@ -71,6 +71,8 @@ void Database::updateRowInTable(const string &tableName, const long long rowInde
         throw InvalidDataForUpdateException(rowData.size(), table.getColumns().size());
     }
     table.updateRow(rowIndex, rowData);
+
+    updateTableInFile(tableName);
 }
 
 void Database::removeRowFromTable(const string &tableName, const long long rowIndex) {
@@ -253,6 +255,35 @@ void Database::printDatabase() {
             cout << endl;
         }
     }
+}
+
+void Database::updateTableInFile(const string &tableName) { // for native format
+    ifstream inFile("output.txt");
+    ofstream outFile("output_temp.txt");
+    string line;
+    bool isUpdatingTable = false;
+
+    while (getline(inFile, line)) {
+        if (line == "\t" + tableName) {
+            isUpdatingTable = true;
+            outFile << line << endl;
+            auto it = tables.find(tableName);
+            if (it != tables.end()) {
+                it->second.printTableInFile(outFile);
+            }
+        } else if (line == "#" && isUpdatingTable) {
+            isUpdatingTable = false;
+            outFile << line << endl;
+        } else if (!isUpdatingTable) {
+            outFile << line << endl;
+        }
+    }
+
+    inFile.close();
+    outFile.close();
+
+    remove("output.txt");
+    rename("output_temp.txt", "output.txt");
 }
 
 const string &Database::getName() const {
