@@ -43,6 +43,8 @@ public:
 
     void printDatabase();
 
+    void updateTableInFile(const string& tableName);
+
     //<editor-fold desc="Getters">
 
     const string &getName() const;
