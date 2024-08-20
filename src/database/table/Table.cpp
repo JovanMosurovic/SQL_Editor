@@ -102,6 +102,37 @@ void Table::printTable() const {
     ConsoleUtils::printLine(columnWidths, '\xC0', '\xC1', '\xD9');
 }
 
+void Table::printTableInFile(ostream &os, const vector<string> &selectedColumns) const {
+    os << "\t" << name << endl;
+
+    if (selectedColumns.empty()) {
+        for (const auto &column: columns) {
+            os << column.getName() << "~";
+        }
+        os << endl;
+
+        for (const auto &row: rows) {
+            for (const auto &data: row.getData()) {
+                os << data << "~";
+            }
+            os << endl;
+        }
+    } else {
+        for (const auto &columnName: selectedColumns) {
+            os << columnName << "~";
+        }
+        os << endl;
+
+        for (const auto &row: rows) {
+            for (const auto &columnName: selectedColumns) {
+                int columnIndex = getColumnIndex(columnName);
+                os << row.getData()[columnIndex] << "~";
+            }
+            os << endl;
+        }
+    }
+}
+
 //<editor-fold desc="Getters">
 
 const vector<Column> &Table::getColumns() const {
