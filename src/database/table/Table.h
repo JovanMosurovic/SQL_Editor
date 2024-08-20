@@ -41,6 +41,7 @@ public:
 
     void printTable() const;
 
+    void printTableInFile(ostream &os, const vector<string>& selectedColumns = {}) const;
 
     //<editor-fold desc="Getters">
 
