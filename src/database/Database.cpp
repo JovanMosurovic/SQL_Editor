@@ -88,45 +88,98 @@ void Database::clearTable(const string &tableName) {
     table.clearRows();
 }
 
-void Database::selectFromTable(const string &tableName, const string &tableAlias, const vector<string> &columnNames, const vector<shared_ptr<IFilter>>& filters) {
+void Database::selectFromTable(const string &tableName, const string &tableAlias,
+                               const vector<string> &columnNames,
+                               const vector<shared_ptr<IFilter>>& filters,
+                               const string &joinTableName,
+                               const string &joinColumn,
+                               const string &joinColumn2) {
     Table &table = getTable(tableName);
+    Table *joinTable = nullptr;
+    bool isJoin = !joinTableName.empty();
 
-    for(const auto &columnName : columnNames) {
-        if(!table.hasColumn(columnName)) {
+    if (isJoin) {
+        joinTable = &getTable(joinTableName);
+    }
+
+    vector<Column> selectedColumns;
+    vector<string> actualColumnNames = columnNames;
+
+    if (columnNames.size() == 1 && columnNames[0] == "*") {
+        actualColumnNames.clear();
+        for (const auto &column : table.getColumns()) {
+            actualColumnNames.push_back(column.getName());
+        }
+        if (isJoin) {
+            for (const auto &column : joinTable->getColumns()) {
+                actualColumnNames.push_back(column.getName());
+            }
+        }
+    }
+
+    for (const auto &columnName : actualColumnNames) {
+        if (table.hasColumn(columnName)) {
+            selectedColumns.push_back(table.getColumns()[table.getColumnIndex(columnName)]);
+        } else if (isJoin && joinTable->hasColumn(columnName)) {
+            selectedColumns.push_back(joinTable->getColumns()[joinTable->getColumnIndex(columnName)]);
+        } else {
             throw ColumnDoesNotExistException(columnName);
         }
     }
-    vector<Column> selectedColumns;
-    for(const auto &columnName : columnNames) {
-        int columnIndex = table.getColumnIndex(columnName);
-        selectedColumns.push_back(table.getColumns()[columnIndex]);
-    }
-    Table selectedTable(tableAlias, selectedColumns);
 
-    for (const auto &row : table.getRows()) {
-        bool shouldAddRow = true;
-        for (const auto &filter : filters) {
-            if (filter && !filter->applyFilter(row)) {
-                shouldAddRow = false;
-                break;
+    Table resultTable(tableAlias, selectedColumns);
+
+    for (const auto &row1 : table.getRows()) {
+        if (isJoin) {
+            for (const auto &row2 : joinTable->getRows()) {
+                if (row1.getColumnValue(joinColumn) == row2.getColumnValue(joinColumn2)) {
+                    vector<string> combinedRowData;
+                    bool shouldAddRow = true;
+
+                    for (const auto &columnName : actualColumnNames) {
+                        if (table.hasColumn(columnName)) {
+                            combinedRowData.push_back(row1.getColumnValue(columnName));
+                        } else {
+                            combinedRowData.push_back(row2.getColumnValue(columnName));
+                        }
+                    }
+
+                    for (const auto &filter : filters) {
+                        if (filter && !filter->applyFilter(Row(actualColumnNames, combinedRowData))) {
+                            shouldAddRow = false;
+                            break;
+                        }
+                    }
+
+                    if (shouldAddRow) {
+                        resultTable.addRow(combinedRowData);
+                    }
+                }
+            }
+        } else {
+            bool shouldAddRow = true;
+            for (const auto &filter : filters) {
+                if (filter && !filter->applyFilter(row1)) {
+                    shouldAddRow = false;
+                    break;
+                }
+            }
+            if (shouldAddRow) {
+                vector<string> selectedRow;
+                selectedRow.reserve(actualColumnNames.size());
+                for (const auto &columnName : actualColumnNames) {
+                    selectedRow.push_back(row1.getColumnValue(columnName));
+                }
+                resultTable.addRow(selectedRow);
             }
         }
-        if (shouldAddRow) {
-            vector<string> selectedRow;
-            selectedRow.reserve(columnNames.size());
-            for (const auto &columnName : columnNames) {
-                selectedRow.push_back(row.getData()[table.getColumnIndex(columnName)]);
-            }
-            selectedTable.addRow(selectedRow);
-        }
     }
 
-    if (selectedTable.getRows().empty()) {
+    if (resultTable.getRows().empty()) {
         cout << "\xC4> Query did not return any results." << endl;
     } else {
-        selectedTable.printTable();
+        resultTable.printTable();
     }
-
 }
 
 shared_ptr<Table> Database::innerJoinTables(const string &table1Name, const string &table2Name, const string &column1,
