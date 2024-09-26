@@ -1,4 +1,4 @@
-# SQL Editor
+# SQL Editor (Console app)
 
 This project encapsulates a command-line Database Management System (DBMS) developed in C++. It offers an interactive interface for users to manipulate databases, tables, and records. The system is designed to interpret and execute SQL-like commands, enabling a comprehensive suite of operations such as creating, reading, updating, and deleting (CRUD) data.
 <br />
